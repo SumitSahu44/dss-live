@@ -1,8 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-// GSAP plugin register karna zaroori hai
 gsap.registerPlugin(ScrollTrigger);
 
 const SatisfactionText = () => {
@@ -14,62 +13,78 @@ const SatisfactionText = () => {
     const upper = upperRef.current;
     const lower = lowerRef.current;
 
-    // Starting state: text off-screen
-    gsap.set([upper, lower], { y: 120, opacity: 0 });
+    // Starting positions (down + fade)
+    gsap.set(upper, { y: 120, opacity: 0 });
+    gsap.set(lower, { y: 120, opacity: 0 });
 
-    // ScrollTrigger animation
-    gsap.to(upper, {
-      y: 0,
-      x: -40,           // thoda left move
-      opacity: 1,
-      ease: "power3.out",
-      duration: 1.6,
+    const tl = gsap.timeline({
       scrollTrigger: {
         trigger: containerRef.current,
-        start: "top 80%",     // jab container 80% viewport mein aaye
-        end: "bottom 20%",
-        scrub: 1,             // smooth scrolling ke saath move karega
-        // markers: true,     // debugging ke liye (baad mein hata dena)
-      }
+        start: "top 95%", // section jaisi hi dikhne lage
+        end: "bottom 80%", // hide hone se pehle tak
+        scrub: 1.2,
+        // markers: true,
+      },
     });
 
-    gsap.to(lower, {
+    // ✨ BOTH TEXT APPEAR WHEN SECTION ENTERS
+    tl.to(upper, {
       y: 0,
-      x: 40,            // thoda right move
       opacity: 1,
+      duration: 1.2,
       ease: "power3.out",
-      duration: 1.6,
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 80%",
-        end: "bottom 20%",
-        scrub: 1,
-      }
     });
 
-    // Cleanup
-    return () => {
-      ScrollTrigger.getAll().forEach(st => st.kill());
-    };
+    tl.to(
+      lower,
+      {
+        y: 0,
+        opacity: 1,
+        duration: 1.2,
+        ease: "power3.out",
+      },
+      "-=1"
+    );
+
+    // ✨ SCROLL KARTE HI:
+    // UPPER → LEFT TOUCH
+    tl.to(upper, {
+      x: -window.innerWidth / 3, // left edge ke paas
+      ease: "power2.inOut",
+      duration: 1.5,
+    });
+
+    // LOWER → RIGHT TOUCH
+    tl.to(
+      lower,
+      {
+        x: window.innerWidth / 3, // right edge ke paas
+        ease: "power2.inOut",
+        duration: 1.5,
+      },
+      "-=1.2"
+    );
   }, []);
 
   return (
-    <div 
+    <div
       ref={containerRef}
-      className="min-h-screen flex items-center justify-center bg-black text-white overflow-hidden"
+      className="min-h-screen flex items-center justify-center 
+      bg-black text-white overflow-hidden px-4"
     >
-      <div className="text-center leading-tight">
-        <h1 
+      <div className="text-center leading-tight drop-shadow-xl">
+        <h1
           ref={upperRef}
-          className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight"
-          style={{ display: 'block' }}
+          className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight
+          bg-gradient-to-r from-blue-400 to-blue-200 text-transparent bg-clip-text"
         >
           Your Satisfaction
         </h1>
-        <h1 
+
+        <h1
           ref={lowerRef}
-          className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tight"
-          style={{ display: 'block' }}
+          className="text-5xl md:text-7xl lg:text-8xl font-extrabold tracking-tight
+          bg-gradient-to-r from-orange-300 to-orange-500 text-transparent bg-clip-text"
         >
           Is Our Success
         </h1>

@@ -1,11 +1,14 @@
-import React, { useEffect, useRef } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 gsap.registerPlugin(ScrollTrigger);
 
 const UGCTestimonials = () => {
-  const sliderRef = useRef(null);
-  const containerRef = useRef(null);
+  const sectionRef = useRef(null);
+  const titleRef = useRef(null);
+  const cardsRef = useRef([]);
+  const glowRef = useRef(null);
 
   const testimonials = [
     { id: 1, video: "/videos/Video-793.mp4", name: "Rohan Sharma", company: "Starlight Solar" },
@@ -19,135 +22,159 @@ const UGCTestimonials = () => {
   ];
 
   useEffect(() => {
-  const ctx = gsap.context(() => {
-    const slider = sliderRef.current;
-    if (!slider) return;    // IMPORTANT FIX
+    const ctx = gsap.context(() => {
+      // Moving Gradient Glow (same as other sections)
+      // gsap.to(glowRef.current, {
+      //   xPercent: 150,
+      //   ease: "none",
+      //   scrollTrigger: {
+      //     trigger: sectionRef.current,
+      //     scrub: 1,
+      //     start: "top bottom",
+      //     end: "bottom top",
+      //   },
+      // });
 
-    const cards = Array.from(slider.children);
-    if (!cards.length) return;  // Prevents undefined crash
+      // Epic Title Animation
+      gsap.fromTo(
+        titleRef.current.children,
+        { y: 200, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 1.8,
+          stagger: 0.2,
+          ease: "power4.out",
+          scrollTrigger: {
+            trigger: titleRef.current,
+            start: "top 80%",
+          },
+        }
+      );
 
-    gsap.from(cards, {
-      y: 80,
-      opacity: 0,
-      duration: 1.2,
-      stagger: 0.1,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top 80%"
-      }
-    });
+      // Cards Staggered Entry + Hover Glow
+      cardsRef.current.forEach((card, i) => {
+        if (!card) return;
 
-    // next prev
-    const nextBtn = document.getElementById("next-btn");
-    const prevBtn = document.getElementById("prev-btn");
+        gsap.fromTo(
+          card,
+          { y: 180, opacity: 0, scale: 0.85 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 1.5,
+            delay: i * 0.1,
+            ease: "back.out(1.6)",
+            scrollTrigger: {
+              trigger: card,
+              start: "top 90%",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
 
-    const scrollAmount = 300;
+        // Hover Lift + Intense Glow
+        card.addEventListener("mouseenter", () => {
+          gsap.to(card, { y: -20, scale: 1.05, duration: 0.6, ease: "power2.out" });
+          // gsap.to(card.querySelector(".card-glow"), { opacity: 0.7, duration: 0.8 });
+        });
+        card.addEventListener("mouseleave", () => {
+          gsap.to(card, { y: 0, scale: 1, duration: 0.7 });
+          // gsap.to(card.querySelector(".card-glow"), { opacity: 0, duration: 0.6 });
+        });
+      });
 
-    const scrollNext = () =>
-      slider.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    }, sectionRef);
 
-    const scrollPrev = () =>
-      slider.scrollBy({ left: -scrollAmount, behavior: "smooth" });
-
-    nextBtn?.addEventListener("click", scrollNext);
-    prevBtn?.addEventListener("click", scrollPrev);
-
-    return () => {
-      nextBtn?.removeEventListener("click", scrollNext);
-      prevBtn?.removeEventListener("click", scrollPrev);
-    };
-  }, containerRef);
-
-  return () => ctx.revert();
-}, []);
-
+    return () => ctx.revert();
+  }, []);
 
   return (
-    <section ref={containerRef} className="relative bg-black py-24 overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute inset-0 opacity-25 pointer-events-none">
-        <div className="absolute top-40 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] bg-[#0078f0]/30 rounded-full blur-3xl" />
+    <section
+      ref={sectionRef}
+      className="relative min-h-screen bg-black text-white overflow-hidden py-32"
+    >
+      {/* Animated Moving Gradient Glow */}
+      <div ref={glowRef} className="absolute inset-0 opacity-40 pointer-events-none">
+        {/* <div className="absolute inset-0 bg-gradient-to-r from-[#0078f0] via-transparent to-[#ff6b00] blur-3xl translate-x-[-100%]" /> */}
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
-        {/* Heading */}
-        <div className="text-center mb-16">
-          <h2 className="text-6xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-tight">
-            <span className="bg-gradient-to-r from-white via-[#0078f0] to-white bg-clip-text text-transparent">
-              WHAT OUR
+        {/* Massive Gradient Title */}
+        <div ref={titleRef} className="text-center mb-24">
+          <h2 className="text-7xl md:text-9xl font-black tracking-tighter leading-none">
+            <span className="bg-gradient-to-r from-blue-400 to-blue-200 bg-clip-text text-transparent">
+              Real Voices
             </span>
-            <br />
-            <span className="text-[#0078f0] [text-shadow:0_0_140px_#0078f0]">
-              CLIENTS SAY
+          </h2>
+          <h2 className="text-7xl md:text-9xl font-black tracking-tighter leading-none -mt-8">
+            <span className="bg-gradient-to-r from-orange-300 to-orange-500 bg-clip-text text-transparent">
+              Real Results
             </span>
           </h2>
         </div>
 
-        {/* Slider with Arrows */}
-        <div className="relative group">
-          {/* Prev Button */}
-          <button
-            id="prev-btn"
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-20 w-14 h-14 bg-black/70 backdrop-blur-md border border-zinc-700 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-400 hover:bg-[#0078f0] hover:border-[#0078f0]"
-          >
-            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
-            </svg>
-          </button>
+        {/* Horizontal Scrolling Testimonials */}
+        <div className="flex gap-10 overflow-x-auto scrollbar-hide px-10 md:px-20 pb-8">
+          {testimonials.concat(testimonials.slice(0, 3)).map((t, i) => (
+            <div
+              key={i}
+              id="testimonials"
+              ref={(el) => (cardsRef.current[i] = el)}
+              className="group relative flex-shrink-0 w-80 md:w-96 cursor-grab active:cursor-grabbing"
+            >
+              {/* Hover Glow */}
+              {/* niceh clas me ad kr  bg-gradient-to-br from-[#0078f0]/60 to-[#ff6b00]/60  */}
+              <div className="card-glow absolute -inset-2 rounded-3xl blur-3xl opacity-0 
+               transition-opacity duration-700" />
 
-          {/* Next Button */}
-          <button
-            id="next-btn"
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-20 w-14 h-14 bg-black/70 backdrop-blur-md border border-zinc-700 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-400 hover:bg-[#0078f0] hover:border-[#0078f0]"
-          >
-            <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
-            </svg>
-          </button>
+              {/* Video Card */}
+              {/* niceh class me  hover:border-[#0078f0]/70 hover:shadow-2xl hover:shadow-[#0078f0]/40 */}
+              <div className="relative bg-black/80 backdrop-blur-xl border border-zinc-800 rounded-3xl overflow-hidden 
+                transition-all duration-700">
+                
+                <video
+                  src={t.video}
+                  className="w-full h-96 md:h-[520px] object-cover"
+                  loop
+                  muted
+                  playsInline
+                  autoPlay
+                />
 
-          {/* Horizontal Slider */}
-          <div
-            ref={sliderRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory scroll-smooth px-20 md:px-24"
-          >
-            {testimonials.concat(testimonials).map((t, i) => (
-              <div
-                key={i}
-                className="flex-shrink-0 w-72 snap-center"
-              >
-                <div className="relative rounded-2xl overflow-hidden border-4 border-zinc-900 bg-black shadow-2xl hover:border-[#0078f0]/60 transition-all duration-500">
-                  <video
-                    src={t.video}
-                    className="w-full h-80 md:h-96 object-cover"
-                    loop
-                    muted
-                    playsInline
-                    autoPlay
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 p-6">
-                    <h3 className="text-xl font-bold text-white">{t.name}</h3>
-                    <p className="text-[#0078f0] font-semibold text-sm mt-1">{t.company}</p>
-                  </div>
+                {/* Gradient Overlay + Name */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent pointer-events-none" />
+                <div className="absolute bottom-0 left-0 p-8">
+                  <h3 className="text-3xl md:text-4xl font-black bg-gradient-to-r from-blue-400 to-blue-200 bg-clip-text text-transparent">
+                    {t.name}
+                  </h3>
+                  <p className="text-xl font-semibold bg-gradient-to-r from-orange-300 to-orange-500 bg-clip-text text-transparent mt-1">
+                    {t.company}
+                  </p>
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Stats Bar */}
+        <div className="text-center mt-20">
+          <p className="text-3xl md:text-4xl font-light text-zinc-300">
+            Trusted by{" "}
+            <span className="font-black text-5xl bg-gradient-to-r from-blue-400 to-blue-200 bg-clip-text text-transparent">
+              500+
+            </span>{" "}
+            brands across{" "}
+            <span className="font-black text-5xl bg-gradient-to-r from-orange-300 to-orange-500 bg-clip-text text-transparent">
+              10+ countries
+            </span>
+          </p>
         </div>
 
         {/* Mobile Hint */}
-        <div className="text-center mt-12 md:hidden">
-          <p className="text-zinc-600 text-sm">Swipe to explore</p>
-        </div>
-
-        {/* Stats */}
-        <div className="text-center mt-20">
-          <p className="text-2xl md:text-3xl text-zinc-300 font-light">
-            <span className="text-[#0078f0] font-bold">500+</span> Happy Clients • 
-            <span className="text-[#0078f0] font-bold"> 10+</span> Countries • 
-            <span className="text-[#0078f0] font-bold"> 7</span> Years of Trust
-          </p>
+        <div className="text-center mt-8 md:hidden">
+          <p className="text-zinc-500 text-sm">← Swipe to see more →</p>
         </div>
       </div>
 

@@ -7,23 +7,29 @@ import SatisfactionText from './components/SatisfactionText.jsx'
 import CreativeAgencySection from './components/CreativeAgencySection.jsx'
 import UGCTestimonials from './components/UGCTestimonials.jsx'
 import PremiumHero from './components/PremiumHero.jsx'
+import CustomCursor from './components/CustomCursor.jsx'
 // import InfiniteServicesMarquee from './components/InfiniteServicesMarquee.jsx'
 // import BeyondPixelsSection from './components/BeyondPixelsSection.jsx'
-// import PortfolioShowcase from './components/PortfolioShowcase.jsx'
+import PortfolioShowcase from './components/PortfolioShowcase.jsx'
+import CreativeFooter from './components/CreativeFooter.jsx'
+import ContactSection from './components/ContactSection.jsx'
 
 const App = () => {
   return (
     <div>
+      <CustomCursor />
       <Navbar />
       <PremiumHero />
       {/* <NewHero /> */}
       {/* <Hero /> */}
       <SatisfactionText />
       <CreativeAgencySection />
-      {/* <PortfolioShowcase /> */}
+      <PortfolioShowcase />
       {/* <BeyondPixelsSection /> */}
       {/* <InfiniteServicesMarquee /> */}
       <UGCTestimonials />
+      <ContactSection />
+      <CreativeFooter />
     </div>
   )
 }
