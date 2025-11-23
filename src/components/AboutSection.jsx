@@ -108,9 +108,9 @@ const AboutSection = () => {
 
           {/* Right - Content */}
           <div ref={textRef} className="space-y-8">
-            <h2 className="text-5xl md:text-7xl font-black leading-tight">
+            <h2 className="text-5xl md:text-6xl font-black leading-tight">
               We Don't Just Build Websites.
-              <span className="block text-4xl md:text-6xl mt-4 text-zinc-400 font-light">
+              <span className="block text-4xl md:text-5xl mt-4 text-zinc-400 font-light">
                 We Build <span className="text-blue-400">Growth Machines</span>.
               </span>
             </h2>
@@ -132,7 +132,7 @@ const AboutSection = () => {
                   data-value={stat.value}
                   className="text-center"
                 >
-                  <div className="text-5xl md:text-6xl font-black text-white">
+                  <div className="text-5xl  font-black text-white">
                     <span>0</span>
                   </div>
                   <p className="text-zinc-400 mt-2 text-sm md:text-base">{stat.label}</p>
