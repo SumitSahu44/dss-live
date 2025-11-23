@@ -85,7 +85,7 @@ const HeroSection = () => {
 
       {/* CTA */}
       <div className="hero-cta z-20 mb-16 md:mb-20">
-        <button className="group px-10 md:px-12 py-5 md:py-6 bg-gradient-to-r from-[#0078f0] to-cyan-500 text-black font-bold text-lg md:text-xl rounded-full shadow-2xl hover:scale-110 hover:shadow-[#0078f0]/70 transition-all duration-500 flex items-center gap-4 mx-auto">
+        <button className="group px-10 md:px-8 py-3 md:py-3 bg-gradient-to-r from-[#0078f0] to-cyan-500 text-black font-bold text-lg md:text-xl rounded-full shadow-2xl hover:scale-110 hover:shadow-[#0078f0]/70 transition-all duration-500 flex items-center gap-4 mx-auto">
           Book a Call
           <svg className="w-7 h-7 md:w-8 md:h-8 group-hover:translate-x-3 transition-transform" fill="none" stroke="currentColor" strokeWidth={3} viewBox="0 0 24 24">
             <path d="M17 8l4 4m0 0l-4 4m4-4H3" />

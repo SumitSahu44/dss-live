@@ -95,7 +95,7 @@ export default function CursorFollower() {
       {/* Cursor Follower - Animated Circle */}
       <div
         ref={followerRef}
-        className="fixed w-12 h-12 rounded-full pointer-events-none will-change-transform"
+        className="hidden md:block fixed w-12 h-12 rounded-full pointer-events-none will-change-transform"
         style={{
           left: 0,
           top: 0,

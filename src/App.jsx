@@ -18,7 +18,7 @@ import AboutSection from './components/AboutSection.jsx'
 const App = () => {
   return (
     <div>
-      <CustomCursor />
+      <CustomCursor  />
       <Navbar />
       <PremiumHero />
       <AboutSection />
