@@ -1,143 +1,151 @@
-import React, { useState, useEffect } from "react";
-import { gsap } from "gsap";
-import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import React, { useState, useEffect, useRef } from "react";
+import gsap from "https://esm.sh/gsap";
 
-gsap.registerPlugin(ScrollToPlugin);
-
-const Navbar = () => {
+export default function Navbar() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navRef = useRef(null);
+  const mobileMenuRef = useRef(null);
 
-  const navLinks = [
-    { name: "Home", id: "home" },
-    { name: "About", id: "about" },
-    { name: "Services", id: "services" },
-    { name: "Portfolio", id: "portfolio" },
-    { name: "Testimonials", id: "testimonials" },
-    { name: "Contact", id: "contact" },
-  ];
-
-  // Smooth scroll
-  const scrollToSection = (sectionId) => {
-    gsap.to(window, {
-      duration: 1.3,
-      scrollTo: { y: `#${sectionId}`, offsetY: 90 },
-      ease: "power3.inOut",
-    });
-    setIsMenuOpen(false);
-  };
-
-  // Hide on scroll down, show on scroll up
+  // --- SMART SCROLL LOGIC ---
   useEffect(() => {
     const handleScroll = () => {
-      const current = window.scrollY;
-      if (current > lastScrollY && current > 150) {
+      const currentScrollY = window.scrollY;
+      
+      // Show navbar if at the very top OR scrolling UP
+      if (currentScrollY < 10) {
+        setIsVisible(true);
+      } else if (currentScrollY > lastScrollY) {
+        // Scrolling DOWN -> Hide
         setIsVisible(false);
-      } else if (current < lastScrollY) {
+        setIsMobileMenuOpen(false); // Close mobile menu on scroll
+      } else {
+        // Scrolling UP -> Show
         setIsVisible(true);
       }
-      setLastScrollY(current);
+
+      setLastScrollY(currentScrollY);
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  // --- MOBILE MENU ANIMATION ---
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      gsap.to(mobileMenuRef.current, {
+        height: "auto",
+        opacity: 1,
+        duration: 0.5,
+        ease: "power3.out",
+      });
+    } else {
+      gsap.to(mobileMenuRef.current, {
+        height: 0,
+        opacity: 0,
+        duration: 0.4,
+        ease: "power3.in",
+      });
+    }
+  }, [isMobileMenuOpen]);
+
   return (
     <>
-      {/* Navbar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        ref={navRef}
+        className={`fixed top-0 left-0 w-full z-50 transition-transform duration-500 ease-in-out ${
           isVisible ? "translate-y-0" : "-translate-y-full"
-        } ${lastScrollY > 100 ? "bg-transparent" : "bg-transparent"}`} /* after ? bg-black/70 backdrop-blur-md  */
+        }`}
       >
-        <div className="container mx-auto px-6 py-1">
-          <div className="flex items-center justify-between">
-            {/* Logo Image - Left */}
-            <div
-              onClick={() => scrollToSection("home")}
-              className="cursor-pointer"
-            >
-              <img
-                src="/images/Logo DSS RGB-01.png" // Apna logo yahan daal do
-                alt="Your Agency"
-                className="h-20 w-auto object-contain"
-              />
+        {/* Glass Container */}
+        <div className="absolute inset-0border-b border-white/10" />
+        
+        {/* Top Gradient Line */}
+        <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#0078f0] to-transparent opacity-50" />
+
+        <div className="container mx-auto px-6 py-4 relative z-10 flex items-center justify-between">
+          
+          {/* --- LOGO --- */}
+          <a href="#" className="flex items-center gap-2 group">
+            {/* Replace src with your actual logo path */}
+            <div className="w-20 h-20 flex items-center justify-center  overflow-hidden group-hover:border-[#0078f0] transition-colors">
+               {/* Placeholder for Logo Image */}
+               <img 
+                 src="/images/Logo DSS RGB-01.png" 
+                 alt="Logo" 
+                 className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" 
+               />
             </div>
+          
+          </a>
 
-            {/* Desktop Links */}
-            <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.id)}
-                  className="relative text-white text-sm font-medium tracking-wide transition-all duration-300
-                    after:absolute after:bottom-0 after:left-0 after:w-0 after:h-0.5 
-                    after:bg-gradient-to-r after:from-blue-400 after:to-orange-500 
-                    after:rounded-full after:transition-all after:duration-500
-                    hover:after:w-full hover:text-white"
-                >
-                  {link.name}
-                </button>
-              ))}
-
-              {/* CTA */}
-              <button
-                onClick={() => scrollToSection("contact")}
-                className="ml-6 px-6 py-2.5 text-sm font-bold text-white rounded-lg
-                  bg-[#0078f0] hover:to-orange-500 
-                  shadow-lg hover:shadow-blue-500/30 
-                  transition-all duration-300"
+          {/* --- DESKTOP LINKS --- */}
+          <div className="hidden md:flex items-center gap-8">
+            {['Work', 'Services', 'About', 'Insights'].map((link) => (
+              <a 
+                key={link} 
+                href={`#${link.toLowerCase()}`} 
+                className="text-sm font-medium text-gray-400 hover:text-white transition-colors relative group"
               >
-                Let's Talk
-              </button>
-            </div>
+                {link}
+                <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-[#ff9f20] transition-all duration-300 group-hover:w-full" />
+              </a>
+            ))}
+          </div>
 
-            {/* Mobile Menu Toggle */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden text-2xl text-white"
+          {/* --- CTA BUTTON & MOBILE TOGGLE --- */}
+          <div className="flex items-center gap-4">
+            
+            {/* Desktop CTA */}
+            <a 
+              href="#contact" 
+              className="hidden md:flex group relative px-6 py-2 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-full overflow-hidden hover:scale-105 transition-transform"
             >
-              {isMenuOpen ? "×" : "☰"}
+              <span className="relative z-10 group-hover:text-white transition-colors duration-300">Let's Talk</span>
+              <div className="absolute inset-0 bg-[#0078f0] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+            </a>
+
+            {/* Mobile Hamburger */}
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden w-10 h-10 flex flex-col justify-center items-center gap-1.5 group"
+            >
+              <span className={`w-6 h-[2px] bg-white transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+              <span className={`w-6 h-[2px] bg-white transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-0' : ''}`} />
+              <span className={`w-6 h-[2px] bg-white transition-transform duration-300 ${isMobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
             </button>
           </div>
         </div>
-      </nav>
 
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 bg-black/95 backdrop-blur-xl z-40 flex flex-col items-center justify-center gap-8 pt-20">
-          {navLinks.map((link, i) => (
-            <button
-              key={link.id}
-              onClick={() => scrollToSection(link.id)}
-              className="text-4xl font-bold tracking-tight"
-            >
-              <span
-                className={`bg-gradient-to-r bg-clip-text text-transparent ${
-                  i % 2 === 0
-                    ? "from-blue-400 to-blue-200"
-                    : "from-orange-300 to-orange-500"
-                }`}
+        {/* --- MOBILE MENU DROPDOWN --- */}
+        <div 
+          ref={mobileMenuRef} 
+          className="md:hidden overflow-hidden h-0 bg-[#050505] border-b border-white/10"
+        >
+          <div className="flex flex-col items-center gap-6 py-8">
+            {['Work', 'Services', 'About', 'Insights'].map((link) => (
+              <a 
+                key={link} 
+                href={`#${link.toLowerCase()}`} 
+                className="text-lg font-medium text-gray-300 hover:text-[#0078f0] transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
-                {link.name}
-              </span>
-            </button>
-          ))}
-
-          <button
-            onClick={() => scrollToSection("contact")}
-            className="mt-8 px-12 py-4 text-xl font-bold rounded-xl bg-gradient-to-r from-blue-600 to-orange-600"
-          >
-            Start Project
-          </button>
+                {link}
+              </a>
+            ))}
+            <a 
+              href="#contact" 
+              className="px-8 py-3 bg-white text-black font-bold uppercase tracking-widest text-xs rounded-full mt-4"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Start Project
+            </a>
+          </div>
         </div>
-      )}
 
-      {/* Spacer for content */}
-      {/* <div className="h-20 md:h-24" /> */}
+      </nav>
     </>
   );
-};
-
-export default Navbar;
+}
