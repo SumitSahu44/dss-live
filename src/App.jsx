@@ -1,57 +1,63 @@
-import React from 'react'
-import Navbar from './components/Navbar.jsx'
-// import HeroSection from './components/HeroSection.jsx'
-// import Hero from './components/Hero.jsx'
-import NewHero from './components/NewHero.jsx'
-import SatisfactionText from './components/SatisfactionText.jsx'
-import CreativeAgencySection from './components/CreativeAgencySection.jsx'
-import UGCTestimonials from './components/UGCTestimonials.jsx'
-import PremiumHero from './components/PremiumHero.jsx'
+import React, { Suspense, useEffect } from 'react'
+
+// --- 1. CRITICAL COMPONENTS (Load immediately for fast First Paint) ---
 import CustomCursor from './components/CustomCursor.jsx'
-// import InfiniteServicesMarquee from './components/InfiniteServicesMarquee.jsx'
-// import BeyondPixelsSection from './components/BeyondPixelsSection.jsx'
-import PortfolioShowcase from './components/PortfolioShowcase.jsx'
-import CreativeFooter from './components/CreativeFooter.jsx'
-import ContactSection from './components/ContactSection.jsx'
-import AboutSection from './components/AboutSection.jsx'
-import VisionMission from './components/VisionMission2.jsx'
-import NewAbout from './components/NewAbout.jsx'
-import Clients from './components/Clients.jsx'
-import NewVisionMission from './components/NewVisionMission.jsx'
-import AchievementTimeline from './components/Achivements.jsx'
-import Services from './components/services.jsx'
-import ZeroToHeroScroll from './Zero-t-Hero.jsx'  
-import Deconstructed from './components/Deconstructed.jsx'
+import Navbar from './components/Navbar.jsx'
+import PremiumHero from './components/PremiumHero.jsx'
+
+// --- 2. LAZY LOAD HEAVY COMPONENTS (Load only when needed) ---
+// Isse initial bundle size kam hoga aur browser hang nahi karega
+const NewAbout = React.lazy(() => import('./components/NewAbout.jsx'))
+const AchievementTimeline = React.lazy(() => import('./components/Achivements.jsx'))
+const Deconstructed = React.lazy(() => import('./components/Deconstructed.jsx'))
+const ZeroToHeroScroll = React.lazy(() => import('./Zero-t-Hero.jsx'))
+const PortfolioShowcase = React.lazy(() => import('./components/PortfolioShowcase.jsx'))
+const Clients = React.lazy(() => import('./components/Clients.jsx'))
+const NewVisionMission = React.lazy(() => import('./components/NewVisionMission.jsx'))
+const UGCTestimonials = React.lazy(() => import('./components/UGCTestimonials.jsx'))
+const ContactSection = React.lazy(() => import('./components/ContactSection.jsx'))
+const CreativeFooter = React.lazy(() => import('./components/CreativeFooter.jsx'))
+
+// --- Simple Loading Fallback ---
+const Loader = () => (
+  <div style={{ height: '20vh', width: '100%', background: '#f5f2eb' }}></div>
+)
+
 const App = () => {
+
+  // Optional: Agar aapne Lenis install nahi kiya hai to 'npm i @studio-freight/lenis' karein.
+  // Ye fast scrolling pe white screen issue ko 90% fix kar deta hai.
+  /*
+  useEffect(() => {
+    const lenis = new Lenis()
+    function raf(time) {
+      lenis.raf(time)
+      requestAnimationFrame(raf)
+    }
+    requestAnimationFrame(raf)
+  }, [])
+  */
+
   return (
-    <div>
-      <CustomCursor  />
+    // 'overflow-hidden' zaruri hai taaki horizontal scroll na aaye
+    <div className="w-full overflow-hidden bg-[#f5f2eb]"> 
+      <CustomCursor />
       <Navbar />
       <PremiumHero />
-       {/* <SatisfactionText /> */}
-         <NewAbout /> 
-          <AchievementTimeline />
-             <Deconstructed />
-               <ZeroToHeroScroll />
 
-                <PortfolioShowcase />
-      <Clients />
-      <NewVisionMission />
-      {/* <AboutSection /> */}
-      {/* <NewHero /> */}
-      {/* <Hero /> */}
-      {/* <Services /> */}
-      {/* <CreativeAgencySection /> */}
-   
-     
-     
-      {/* <BeyondPixelsSection /> */}
-      {/* <InfiniteServicesMarquee /> */}
-      {/* <VisionMission />  */}
-
-      <UGCTestimonials />
-      <ContactSection />
-      <CreativeFooter />
+      {/* Suspense wrapper heavy components ko handle karega */}
+      <Suspense fallback={<Loader />}>
+        {/* <NewAbout /> */}
+        <AchievementTimeline />
+        <Deconstructed />
+        <ZeroToHeroScroll />
+        <PortfolioShowcase />
+        <Clients />
+        <NewVisionMission />
+        <UGCTestimonials />
+        <ContactSection />
+        <CreativeFooter />
+      </Suspense>
     </div>
   )
 }

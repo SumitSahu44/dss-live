@@ -11,21 +11,69 @@ const UGCTestimonials = () => {
   const scrollContainerRef = useRef(null);
   const cardsRef = useRef([]);
 
-  // Duplicate list for infinite loop illusion if needed, keeping it simple for now
+  // BEST PRACTICE: Add 'poster' images (thumbnails) for videos.
   const testimonials = [
-    { id: 1, video: "/videos/Video-793.mp4", name: "Rohan Sharma", company: "Starlight Solar" },
-    { id: 2, video: "/videos/Video-793.mp4", name: "Vikram Singh", company: "MixNuts Premium" },
-    { id: 3, video: "/videos/Video-793.mp4", name: "Ankit Patel", company: "Real Estate Pro" },
-    { id: 4, video: "/videos/Video-793.mp4", name: "Mayank Jain", company: "TechVision" },
-    { id: 5, video: "/videos/Video-793.mp4", name: "Suresh Kumar", company: "Luxury Brand" },
-    { id: 6, video: "/videos/Video-793.mp4", name: "Deepak Mehta", company: "E-Commerce Giant" },
-    { id: 7, video: "/videos/Video-793.mp4", name: "Rajesh Verma", company: "Digital Empire" },
-    { id: 8, video: "/videos/Video-793.mp4", name: "Priya Mehta", company: "Fashion Hub" },
+    { 
+      id: 1, 
+      video: "/videos/Video-793.mp4", 
+      poster: "https://images.unsplash.com/photo-1556155092-490a1ba16284?auto=format&fit=crop&q=80&w=400", 
+      name: "Rohan Sharma", 
+      company: "Starlight Solar" 
+    },
+    { 
+      id: 2, 
+      video: "/videos/Video-793.mp4", 
+      poster: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=400",
+      name: "Vikram Singh", 
+      company: "MixNuts Premium" 
+    },
+    { 
+      id: 3, 
+      video: "/videos/Video-793.mp4", 
+      poster: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400",
+      name: "Ankit Patel", 
+      company: "Real Estate Pro" 
+    },
+    { 
+      id: 4, 
+      video: "/videos/Video-793.mp4", 
+      poster: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400",
+      name: "Mayank Jain", 
+      company: "TechVision" 
+    },
+    { 
+      id: 5, 
+      video: "/videos/Video-793.mp4", 
+      poster: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&q=80&w=400",
+      name: "Suresh Kumar", 
+      company: "Luxury Brand" 
+    },
+    { 
+      id: 6, 
+      video: "/videos/Video-793.mp4", 
+      poster: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=400",
+      name: "Deepak Mehta", 
+      company: "E-Commerce Giant" 
+    },
+    { 
+      id: 7, 
+      video: "/videos/Video-793.mp4", 
+      poster: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&q=80&w=400",
+      name: "Rajesh Verma", 
+      company: "Digital Empire" 
+    },
+    { 
+      id: 8, 
+      video: "/videos/Video-793.mp4", 
+      poster: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400",
+      name: "Priya Mehta", 
+      company: "Fashion Hub" 
+    },
   ];
 
   useEffect(() => {
     // Force refresh to fix any layout shift issues
-    setTimeout(() => ScrollTrigger.refresh(), 500);
+    const timer = setTimeout(() => ScrollTrigger.refresh(), 500);
 
     const ctx = gsap.context(() => {
       
@@ -33,10 +81,14 @@ const UGCTestimonials = () => {
       gsap.fromTo(titleRef.current,
         { y: 50, opacity: 0 },
         { 
-          y: 0, opacity: 1, duration: 1, ease: "power3.out",
+          y: 0, 
+          opacity: 1, 
+          duration: 1, 
+          ease: "power3.out",
+          force3D: true, 
           scrollTrigger: { 
             trigger: titleRef.current, 
-            start: "top 90%" // Triggers earlier to prevent blank space
+            start: "top 90%" 
           }
         }
       );
@@ -45,7 +97,11 @@ const UGCTestimonials = () => {
       gsap.fromTo(scrollContainerRef.current,
         { y: 100, opacity: 0 },
         {
-          y: 0, opacity: 1, duration: 1.2, ease: "power3.out",
+          y: 0, 
+          opacity: 1, 
+          duration: 1.2, 
+          ease: "power3.out",
+          force3D: true,
           scrollTrigger: {
             trigger: scrollContainerRef.current,
             start: "top 85%"
@@ -53,27 +109,64 @@ const UGCTestimonials = () => {
         }
       );
 
-      // 3. Hover Effects (Managed via GSAP for smoothness)
-      cardsRef.current.forEach((card) => {
-        if(!card) return;
-        
-        card.addEventListener("mouseenter", () => {
-           gsap.to(card, { y: -15, scale: 1.02, duration: 0.4, ease: "power2.out" });
-           gsap.to(card.querySelector('.glow-border'), { opacity: 1, duration: 0.4 });
-           gsap.to(card.querySelector('.video-overlay'), { opacity: 0.2, duration: 0.4 }); // Brighten video
-        });
-
-        card.addEventListener("mouseleave", () => {
-           gsap.to(card, { y: 0, scale: 1, duration: 0.4, ease: "power2.out" });
-           gsap.to(card.querySelector('.glow-border'), { opacity: 0, duration: 0.4 });
-           gsap.to(card.querySelector('.video-overlay'), { opacity: 0.6, duration: 0.4 }); // Darken video back
-        });
-      });
-
     }, sectionRef);
 
-    return () => ctx.revert();
+    return () => {
+        ctx.revert();
+        clearTimeout(timer);
+    };
   }, []);
+
+  // --- HANDLERS (Fixed: Using React Events instead of manual listeners) ---
+  const handleMouseEnter = (index) => {
+    const card = cardsRef.current[index];
+    if (!card) return;
+
+    const video = card.querySelector('video');
+    const glow = card.querySelector('.glow-border');
+    const overlay = card.querySelector('.video-overlay');
+    const playBtn = card.querySelector('.play-btn');
+
+    // Animation
+    gsap.to(card, { y: -15, scale: 1.02, duration: 0.4, ease: "power2.out", force3D: true });
+    gsap.to(glow, { opacity: 1, duration: 0.4 });
+    gsap.to(overlay, { opacity: 0.2, duration: 0.4 }); 
+    gsap.to(playBtn, { scale: 0, opacity: 0, duration: 0.3 });
+
+    // Play Video (Safe Play)
+    if(video) {
+        if (video.readyState === 0) video.load(); // Load if not ready
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+                console.log("Auto-play prevented:", error);
+            });
+        }
+    }
+  };
+
+  const handleMouseLeave = (index) => {
+    const card = cardsRef.current[index];
+    if (!card) return;
+
+    const video = card.querySelector('video');
+    const glow = card.querySelector('.glow-border');
+    const overlay = card.querySelector('.video-overlay');
+    const playBtn = card.querySelector('.play-btn');
+
+    // Animation Reset
+    gsap.to(card, { y: 0, scale: 1, duration: 0.4, ease: "power2.out", force3D: true });
+    gsap.to(glow, { opacity: 0, duration: 0.4 });
+    gsap.to(overlay, { opacity: 0.6, duration: 0.4 });
+    gsap.to(playBtn, { scale: 1, opacity: 1, duration: 0.3 });
+
+    // Pause Video
+    if(video) {
+        video.pause();
+        // Optional: Reset video to start
+        video.currentTime = 0; 
+    }
+  };
 
   return (
     <section
@@ -81,9 +174,15 @@ const UGCTestimonials = () => {
       className="relative min-h-screen bg-[#050505] text-white overflow-hidden py-32 font-sans selection:bg-blue-500/30"
     >
       
-      {/* --- BACKGROUND AMBIENCE (Matching Theme) --- */}
+      {/* --- BACKGROUND AMBIENCE --- */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+         <div 
+           className="absolute inset-0 opacity-20 mix-blend-overlay"
+           style={{ 
+             backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')",
+             willChange: 'opacity' 
+           }} 
+         />
          
          {/* Grid */}
          <div className="absolute inset-0 z-0 opacity-10">
@@ -105,7 +204,7 @@ const UGCTestimonials = () => {
              <div className="w-12 h-[1px] bg-gray-700" />
           </div>
 
-          <h2 className="text-6xl md:text-9xl font-black tracking-tighter leading-none text-white mix-blend-exclusion">
+          <h2 className="text-6xl md:text-7xl font-black tracking-tighter leading-none text-white mix-blend-exclusion">
              REAL<br />
              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#0078f0] to-[#ff9f20]">RESULTS.</span>
           </h2>
@@ -122,13 +221,14 @@ const UGCTestimonials = () => {
               key={i}
               ref={(el) => (cardsRef.current[i] = el)}
               className="group relative flex-shrink-0 w-[85vw] md:w-[400px] cursor-pointer"
+              onMouseEnter={() => handleMouseEnter(i)}
+              onMouseLeave={() => handleMouseLeave(i)}
             >
               
               {/* --- CARD CONTAINER --- */}
-              {/* Added a subtle border and background to prevent 'black hole' effect before video loads */}
-              <div className="relative h-[60vh] md:h-[600px] bg-[#111] rounded-[2rem] overflow-hidden border border-white/10 transition-transform duration-500">
+              <div className="relative h-[55vh] md:h-[550px] bg-[#111] rounded-[2rem] overflow-hidden border border-white/10 transition-transform duration-500">
                 
-                {/* 1. GLOW BORDER (Hidden by default, shows on hover) */}
+                {/* 1. GLOW BORDER */}
                 <div className="glow-border absolute inset-0 rounded-[2rem] opacity-0 transition-opacity duration-500 pointer-events-none z-20"
                      style={{ 
                        boxShadow: 'inset 0 0 40px rgba(0,120,240,0.3)',
@@ -139,25 +239,26 @@ const UGCTestimonials = () => {
                 {/* 2. VIDEO LAYER */}
                 <video
                   src={t.video}
-                  className="w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-700 ease-out"
+                  poster={t.poster}
+                  className="w-full h-full object-cover transform scale-105 group-hover:scale-110 transition-transform duration-700 ease-out bg-gray-900"
                   loop
                   muted
                   playsInline
-                  autoPlay
+                  preload="metadata" // Changed to metadata for faster start
                 />
 
-                {/* 3. GRADIENT OVERLAY (Always visible for text readability) */}
+                {/* 3. GRADIENT OVERLAY */}
                 <div className="video-overlay absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-60 transition-opacity duration-500 z-10" />
 
                 {/* 4. CONTENT */}
                 <div className="absolute bottom-0 left-0 w-full p-8 z-30">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="play-btn flex items-center gap-3 mb-2 transition-all duration-300">
                      <div className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-white">
                            <path d="M8 5v14l11-7z" />
                         </svg>
                      </div>
-                     <span className="text-xs font-bold uppercase tracking-widest text-[#0078f0]">Play Story</span>
+                     <span className="text-xs font-bold uppercase tracking-widest text-[#0078f0]">Hover to Play</span>
                   </div>
 
                   <h3 className="text-3xl font-bold text-white leading-tight mb-1">
@@ -176,7 +277,7 @@ const UGCTestimonials = () => {
             </div>
           ))}
           
-          {/* Spacer for right padding */}
+          {/* Spacer */}
           <div className="w-10 flex-shrink-0" />
         </div>
 

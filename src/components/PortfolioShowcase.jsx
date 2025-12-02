@@ -63,33 +63,39 @@ export default function PortfolioShowcase() {
   const progressBarRef = useRef(null);
 
   useEffect(() => {
-    // Force ScrollTrigger to recalculate positions to prevent early blank spaces
-    setTimeout(() => {
-      ScrollTrigger.refresh();
-    }, 500);
-
     const ctx = gsap.context(() => {
       
-      // 1. Header Animation - Faster & Earlier Trigger
+      // 1. Header Animation (Optimized with autoAlpha & force3D)
       gsap.fromTo(titleRef.current,
-        { y: 50, opacity: 0 },
+        { y: 50, autoAlpha: 0 }, // autoAlpha handles visibility + opacity
         { 
-          y: 0, opacity: 1, duration: 1, ease: "power3.out",
+          y: 0, 
+          autoAlpha: 1, 
+          duration: 1, 
+          ease: "power3.out",
+          force3D: true, // Force GPU
           scrollTrigger: { 
             trigger: titleRef.current, 
-            start: "top 90%" // Shows up sooner
+            start: "top 90%"
           }
         }
       );
 
-      // 2. Cards Stagger Entry - Optimized for performance
+      // 2. Cards Stagger Entry (Optimized)
+      // 'will-change' CSS class is added in render to help browser prepare
       gsap.fromTo(cardsRef.current,
-        { y: 80, opacity: 0, scale: 0.95 },
+        { y: 60, autoAlpha: 0, scale: 0.95 },
         {
-          y: 0, opacity: 1, scale: 1, duration: 0.8, stagger: 0.1, ease: "power2.out",
+          y: 0, 
+          autoAlpha: 1, 
+          scale: 1, 
+          duration: 0.8, 
+          stagger: 0.1, 
+          ease: "power2.out",
+          force3D: true, // Crucial for stutter-free animation
           scrollTrigger: { 
             trigger: sectionRef.current, 
-            start: "top 80%" // Prevents late pop-in
+            start: "top 75%" // Thoda jaldi start kiya taaki wait na karna pade
           }
         }
       );
@@ -100,6 +106,7 @@ export default function PortfolioShowcase() {
         { 
           scaleX: 1, 
           ease: "none",
+          force3D: true,
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top top",
@@ -118,22 +125,17 @@ export default function PortfolioShowcase() {
   const handleMouseEnter = (e) => {
     const card = e.currentTarget;
     const img = card.querySelector('.project-img');
-    const video = card.querySelector('video');
-
-    if (video) {
-        video.play();
-        gsap.to(video, { opacity: 1, duration: 0.5 });
-        return;
-    }
 
     if (img) {
+      // Calculate only once per hover to avoid layout thrashing during animation
       const scrollHeight = img.offsetHeight - card.querySelector('.viewport').offsetHeight;
       if (scrollHeight > 0) {
         gsap.to(img, {
           y: -scrollHeight,
-          duration: scrollHeight / 150, 
+          duration: scrollHeight / 100, // Thoda fast kiya natural feel ke liye
           ease: "none",
-          overwrite: true
+          overwrite: true,
+          force3D: true // Smooth text rendering during movement
         });
       }
     }
@@ -142,20 +144,14 @@ export default function PortfolioShowcase() {
   const handleMouseLeave = (e) => {
     const card = e.currentTarget;
     const img = card.querySelector('.project-img');
-    const video = card.querySelector('video');
-
-    if (video) {
-        video.pause();
-        video.currentTime = 0;
-        gsap.to(video, { opacity: 0, duration: 0.5 });
-    }
 
     if (img) {
       gsap.to(img, {
         y: 0,
-        duration: 0.8,
-        ease: "power3.out",
-        overwrite: true
+        duration: 0.5, // Faster return
+        ease: "power2.out",
+        overwrite: true,
+        force3D: true
       });
     }
   };
@@ -168,13 +164,23 @@ export default function PortfolioShowcase() {
       
       {/* --- TOP PROGRESS BAR --- */}
       <div className="absolute top-0 left-0 w-full h-1 bg-white/5 z-50">
-         <div ref={progressBarRef} className="h-full w-full bg-gradient-to-r from-[#0078f0] via-purple-500 to-[#ff9f20] shadow-[0_0_15px_rgba(0,120,240,0.5)]" />
+         <div 
+           ref={progressBarRef} 
+           className="h-full w-full bg-gradient-to-r from-[#0078f0] via-purple-500 to-[#ff9f20] shadow-[0_0_15px_rgba(0,120,240,0.5)]" 
+           style={{ transform: 'scaleX(0)' }}
+         />
       </div>
 
-      {/* --- BACKGROUND AMBIENCE (Blue #0078f0 & Orange #ff9f20) --- */}
+      {/* --- BACKGROUND AMBIENCE (Optimized: Content Visibility) --- */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
          {/* Noise Overlay */}
-         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+         <div 
+           className="absolute inset-0 opacity-20 mix-blend-overlay"
+           style={{ 
+             backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')",
+             willChange: 'opacity' 
+           }} 
+         />
          
          {/* Minimal Grid */}
          <div className="absolute inset-0 z-0 opacity-10">
@@ -191,8 +197,7 @@ export default function PortfolioShowcase() {
       <div className="container mx-auto px-6 relative z-10">
         
         {/* --- HEADER --- */}
-        
-          <div  ref={titleRef} className="text-center mb-20">
+        <div ref={titleRef} className="text-center mb-20 will-change-transform">
             <div className="flex items-center justify-center gap-4 text-gray-500 text-xs font-mono uppercase tracking-[0.3em] mb-6">
                <div className="w-12 h-[1px] bg-gray-700" />
                <span>Our Portfolio</span>
@@ -212,7 +217,8 @@ export default function PortfolioShowcase() {
             <div
               key={project.id}
               ref={(el) => (cardsRef.current[i] = el)}
-              className="group relative flex flex-col gap-6 will-change-transform" // Performance boost
+              className="group relative flex flex-col gap-6 will-change-transform" // IMPORTANT for performance
+              style={{ opacity: 0 }} // Initial state handled by GSAP
               onMouseEnter={handleMouseEnter}
               onMouseLeave={handleMouseLeave}
             >
@@ -236,19 +242,22 @@ export default function PortfolioShowcase() {
                 {/* Viewport */}
                 <div className="viewport absolute inset-0 top-8 bg-gray-900 overflow-hidden">
                    {/* Placeholder background while loading */}
-                   <div className="absolute inset-0 bg-[#151515] animate-pulse -z-10" /> 
+                   <div className="absolute inset-0 bg-[#151515] -z-10" /> 
                    
                    <img 
                       src={project.img} 
                       alt={project.title}
-                      loading="lazy"
+                      loading="lazy"    // Lazy load
+                      decoding="async"  // Async decode
+                      width="600"       // Explicit size prevents layout shifts
+                      height="800"
                       className="project-img w-full h-auto object-cover object-top will-change-transform"
                    />
                    
                    {/* Hover Overlay */}
                    <div className="absolute inset-0 bg-black/40 group-hover:opacity-0 transition-opacity duration-500 pointer-events-none flex items-center justify-center">
                       <div className="px-5 py-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest text-white/80 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                         View Case Study
+                          View Case Study
                       </div>
                    </div>
                 </div>

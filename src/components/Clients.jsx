@@ -17,10 +17,11 @@ const brands = [
   { id: 8, name: "Apple", src: "https://upload.wikimedia.org/wikipedia/commons/3/31/Apple_logo_white.svg" },
 ];
 
-export default function PremiumLogoGrid() {
+export default function Clients() {
   const containerRef = useRef(null);
   const cardsRef = useRef([]);
   const headerRef = useRef(null);
+  const rafRef = useRef(null); // Ref for Request Animation Frame
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -29,7 +30,11 @@ export default function PremiumLogoGrid() {
       gsap.fromTo(headerRef.current,
         { y: 50, opacity: 0 },
         {
-          y: 0, opacity: 1, duration: 1, ease: "power3.out",
+          y: 0, 
+          opacity: 1, 
+          duration: 1, 
+          ease: "power3.out",
+          force3D: true,
           scrollTrigger: { trigger: headerRef.current, start: "top 85%" }
         }
       );
@@ -38,7 +43,13 @@ export default function PremiumLogoGrid() {
       gsap.fromTo(cardsRef.current,
         { y: 50, opacity: 0, scale: 0.9 },
         {
-          y: 0, opacity: 1, scale: 1, duration: 0.8, stagger: 0.05, ease: "back.out(1.5)",
+          y: 0, 
+          opacity: 1, 
+          scale: 1, 
+          duration: 0.8, 
+          stagger: 0.05, 
+          ease: "back.out(1.5)",
+          force3D: true,
           scrollTrigger: { trigger: containerRef.current, start: "top 80%" }
         }
       );
@@ -48,33 +59,46 @@ export default function PremiumLogoGrid() {
         const logo = card.querySelector('.brand-logo');
         gsap.to(logo, {
           y: -5,
-          duration: 1.5 + Math.random(), // Randomize duration for organic feel
+          duration: 1.5 + Math.random(), // Randomize duration
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
-          delay: Math.random() // Randomize start
+          delay: Math.random(),
+          force3D: true // Smooth movement
         });
       });
 
     }, containerRef);
 
-    return () => ctx.revert();
+    return () => {
+        ctx.revert();
+        if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
   }, []);
 
-  // --- FLASHLIGHT EFFECT LOGIC ---
+  // --- OPTIMIZED FLASHLIGHT EFFECT ---
   const handleMouseMove = (e) => {
     if (!containerRef.current) return;
 
-    const cards = cardsRef.current;
-    
-    cards.forEach((card) => {
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+    // Use cancelAnimationFrame to ensure we only run once per frame (Throttling)
+    if (rafRef.current) return;
 
-      card.style.setProperty('--mouse-x', `${x}px`);
-      card.style.setProperty('--mouse-y', `${y}px`);
+    rafRef.current = requestAnimationFrame(() => {
+        const cards = cardsRef.current;
+        const { clientX, clientY } = e;
+
+        cards.forEach((card) => {
+            if (!card) return;
+            const rect = card.getBoundingClientRect();
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            // Update CSS variables directly
+            card.style.setProperty('--mouse-x', `${x}px`);
+            card.style.setProperty('--mouse-y', `${y}px`);
+        });
+
+        rafRef.current = null; // Reset for next frame
     });
   };
 
@@ -85,9 +109,15 @@ export default function PremiumLogoGrid() {
       className="relative min-h-[80vh] bg-[#050505] flex flex-col items-center justify-center py-32 px-6 overflow-hidden font-sans selection:bg-blue-500/30"
     >
       
-      {/* --- BACKGROUND AMBIENCE (Matching Previous Sections) --- */}
+      {/* --- BACKGROUND AMBIENCE --- */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
+        <div 
+            className="absolute inset-0 opacity-20 mix-blend-overlay"
+            style={{ 
+                backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')",
+                willChange: 'opacity'
+            }} 
+        />
         
         {/* Ambient Glows */}
         <div className="absolute top-0 left-1/3 w-[600px] h-[600px] bg-[#0078f0]/10 rounded-full blur-[150px] animate-pulse" />
@@ -97,7 +127,7 @@ export default function PremiumLogoGrid() {
       <div className="relative z-10 max-w-6xl w-full">
         
         {/* --- HEADER --- */}
-        <div ref={headerRef} className="text-center mb-20">
+        <div ref={headerRef} className="text-center mb-20 will-change-transform">
             <div className="flex items-center justify-center gap-4 text-gray-500 text-xs font-mono uppercase tracking-[0.3em] mb-6">
                <div className="w-12 h-[1px] bg-gray-700" />
                <span>Ecosystem</span>
@@ -118,7 +148,7 @@ export default function PremiumLogoGrid() {
             <div
               key={brand.id}
               ref={(el) => (cardsRef.current[i] = el)}
-              className="group relative h-48 bg-[#0a0a0a] hover:bg-[#0f0f0f] transition-colors duration-300 flex items-center justify-center overflow-hidden"
+              className="group relative h-48 bg-[#0a0a0a] hover:bg-[#0f0f0f] transition-colors duration-300 flex items-center justify-center overflow-hidden will-change-transform"
             >
               
               {/* 1. FLASHLIGHT BORDER REVEAL (Follows Mouse) */}
@@ -152,11 +182,14 @@ export default function PremiumLogoGrid() {
                  <img 
                    src={brand.src} 
                    alt={brand.name}
-                   className="brand-logo w-16 md:w-20 h-16 md:h-20 object-contain filter grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                   loading="lazy"    // Lazy load
+                   decoding="async"
+                   width="80"        // Explicit sizing
+                   height="80"
+                   className="brand-logo w-16 md:w-20 h-16 md:h-20 object-contain filter grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 will-change-transform"
                    style={{
                      filter: 'grayscale(100%) brightness(0.6)',
                    }}
-                   // Inline override for hover specificity
                    onMouseEnter={(e) => e.currentTarget.style.filter = 'grayscale(0%) drop-shadow(0 0 20px rgba(255,255,255,0.2))'}
                    onMouseLeave={(e) => e.currentTarget.style.filter = 'grayscale(100%) brightness(0.6)'}
                  />
@@ -177,12 +210,12 @@ export default function PremiumLogoGrid() {
         {/* --- BOTTOM TEXT --- */}
         <div className="text-center mt-16 flex flex-col items-center gap-4">
           <p className="text-gray-500 text-sm font-light">
-             Powering next-gen experiences for world-class teams.
+              Powering next-gen experiences for world-class teams.
           </p>
           <div className="flex gap-1">
-             <div className="w-1.5 h-1.5 rounded-full bg-[#0078f0]" />
-             <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-             <div className="w-1.5 h-1.5 rounded-full bg-[#ff9f20]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#0078f0]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#ff9f20]" />
           </div>
         </div>
 

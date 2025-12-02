@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-// Using CDN imports as established
+// CDN Imports for environment compatibility
 import gsap from 'https://esm.sh/gsap';
 import { ScrollTrigger } from 'https://esm.sh/gsap/ScrollTrigger';
 
@@ -67,33 +67,40 @@ export default function BrandProcess() {
     const container = containerRef.current;
     const track = trackRef.current;
     
+    // GSAP Context ensures cleanups are handled perfectly in React
     let ctx = gsap.context(() => {
       
-      // Calculate scroll amount based on track width vs viewport width
+      // OPTIMIZED: Function-based value for responsiveness
+      // Calculates how much to scroll based on track width
       const getScrollAmount = () => {
         let trackWidth = track.scrollWidth;
-        return -(trackWidth - window.innerWidth + 100); // +100 for padding
+        return -(trackWidth - window.innerWidth + 100); 
       };
 
+      // 1. Horizontal Scroll Tween
       const tween = gsap.to(track, {
         x: getScrollAmount,
         ease: "none",
+        force3D: true, // Forces GPU Acceleration (Critical for preventing white screen)
         scrollTrigger: {
           trigger: container,
           start: "top top",
           end: () => `+=${track.scrollWidth - window.innerWidth}`, 
           pin: true,
           scrub: 1,
-          invalidateOnRefresh: true,
+          invalidateOnRefresh: true, // Recalculates on resize
+          anticipatePin: 1, // Smoothens the pinning action
+          fastScrollEnd: true // Prevents glitches on fast scrolling
         }
       });
 
-      // Progress Bar
+      // 2. Progress Bar
       gsap.fromTo(progressBarRef.current, 
         { scaleX: 0, transformOrigin: "left center" },
         { 
           scaleX: 1, 
           ease: "none",
+          force3D: true,
           scrollTrigger: {
             trigger: container,
             start: "top top",
@@ -103,12 +110,13 @@ export default function BrandProcess() {
         }
       );
 
-      // Image Parallax
+      // 3. Image Parallax (Optimized)
       const images = gsap.utils.toArray('.process-img');
       images.forEach((img) => {
         gsap.to(img, {
           xPercent: 15,
           ease: "none",
+          force3D: true,
           scrollTrigger: {
             trigger: container,
             start: "top top",
@@ -126,12 +134,22 @@ export default function BrandProcess() {
   return (
     <div className="bg-[#050505] relative text-white font-sans selection:bg-blue-500/30 overflow-x-hidden">
       
-      {/* Noise Texture */}
-      <div className="fixed inset-0 pt-6 pointer-events-none opacity-20 z-50 mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      {/* Noise Texture (Fixed position to avoid repaint) */}
+      <div 
+        className="fixed inset-0 pt-6 pointer-events-none opacity-20 z-50 mix-blend-overlay"
+        style={{
+          backgroundImage: "url('https://grainy-gradients.vercel.app/noise.svg')",
+          willChange: "opacity"
+        }}
+      />
 
       {/* --- TOP PROGRESS BAR --- */}
       <div className="fixed top-0 left-0 w-full h-1 bg-white/5 z-50">
-         <div ref={progressBarRef} className="h-full w-full bg-gradient-to-r from-blue-500 via-purple-500 to-yellow-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
+         <div 
+           ref={progressBarRef} 
+           className="h-full w-full bg-gradient-to-r from-blue-500 via-purple-500 to-yellow-500 shadow-[0_0_15px_rgba(59,130,246,0.5)]" 
+           style={{ transform: 'scaleX(0)' }}
+         />
       </div>
 
       {/* --- MAIN PINNED CONTAINER (Header + Cards) --- */}
@@ -142,15 +160,15 @@ export default function BrandProcess() {
             <div className="absolute w-full h-full bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:4rem_4rem]" />
         </div>
 
-        {/* 1. FIXED HEADER (Part of the Pinned Section) */}
+        {/* 1. FIXED HEADER */}
         <div className="flex-none h-[25vh] md:h-[30vh] flex flex-col justify-center items-center text-center px-6 relative z-10 border-b border-white/5">
-           <h2 className="text-5xl md:text-8xl font-black text-white tracking-tighter leading-none mb-2">
-              EVOLUTION
+           <h2 className="text-5xl md:text-8xl font-black text-white tracking-tighter leading-none mb-2 will-change-transform">
+             EVOLUTION
            </h2>
            <div className="flex items-center gap-3 text-gray-500 text-xs font-mono uppercase tracking-[0.2em]">
-              <span>Scroll</span>
-              <div className="w-8 h-[1px] bg-gray-700" />
-              <span>Witness The Growth</span>
+             <span>Scroll</span>
+             <div className="w-8 h-[1px] bg-gray-700" />
+             <span>Witness The Growth</span>
            </div>
         </div>
 
@@ -158,22 +176,24 @@ export default function BrandProcess() {
         <div className="flex-1 flex items-center w-full relative z-10">
             <div 
               ref={trackRef} 
-              className="flex items-center pl-[5vw] pr-[20vw] gap-6 md:gap-12"
+              className="flex items-center pl-[5vw] pr-[20vw] gap-6 md:gap-12 will-change-transform" // will-change is crucial here
             >
               {steps.map((step, index) => (
                 <div 
                   key={index} 
                   className={`process-item relative shrink-0 ${step.width} h-[55vh] md:h-[60vh] group overflow-hidden border border-white/10 bg-[#111] transition-all duration-500 hover:border-white/30`}
                 >
-                  {/* ... Card Content (Same as before) ... */}
+                  
                   {/* 1. IMAGE LAYER */}
-                  <div className={`w-full h-full ${step.theme} transition-all duration-700 relative`}>
-                     <img 
+                  <div className={`w-full h-full ${step.theme} transition-all duration-700 relative overflow-hidden`}>
+                      <img 
                         src={step.img} 
                         alt={step.title}
-                        className="process-img w-[130%] h-full object-cover transition-transform duration-700 scale-105"
-                     />
-                     <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none mix-blend-overlay" />
+                        loading="lazy" // Lazy load
+                        decoding="async"
+                        className="process-img w-[130%] h-full object-cover transition-transform duration-700 scale-105 will-change-transform"
+                      />
+                      <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none mix-blend-overlay" />
                   </div>
 
                   {/* 2. GRADIENT OVERLAY */}

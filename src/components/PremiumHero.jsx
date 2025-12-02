@@ -10,59 +10,63 @@ const HeroSection = () => {
   const statsRef = useRef([]);
 
   useEffect(() => {
-    // GSAP Context for proper cleanup in React
     let ctx = gsap.context(() => {
       const stats = statsRef.current;
 
-      // 1. Initial State Set Karen (Hidden & Centered)
+      // 1. Initial State (GPU optimized)
       gsap.set(stats, {
         x: 0,
         y: 0,
-        scale: 0,     // Start completely small
+        scale: 0,
         opacity: 0,
         xPercent: -50,
         yPercent: -50,
         position: "absolute",
         left: "50%",
         top: "50%",
+        force3D: true // Force GPU
       });
 
-      // 2. Animate with ScrollTrigger (Function based values for efficiency)
+      // 2. Animate with ScrollTrigger
       gsap.to(stats, {
-        // Dynamic X/Y based on data attributes
         x: (i, target) => target.dataset.finalX,
         y: (i, target) => target.dataset.finalY,
-        
         scale: 1,
         opacity: 1,
         duration: 1.2,
-        stagger: 0.1,    // Cards ek ke baad ek niklenge
-        ease: "back.out(1.7)", // Thoda "Pop" effect wapas dala hai taki energetic lage
-        
+        stagger: 0.08, // Thoda fast kiya for better feel
+        ease: "back.out(1.7)",
+        force3D: true, // Critical for smooth scroll
         scrollTrigger: {
           trigger: imageContainerRef.current,
-          // CHANGE: "top 55%" means animation starts when image top hits 55% of viewport height
-          // Ye ab screen ke beech mein aane par hi phatega
-          start: "top 55%", 
-          toggleActions: "play none none reverse", // Scroll up karne par wapas reverse hoga
+          start: "top 60%", // Thoda jaldi start kiya
+          toggleActions: "play none none reverse",
         },
       });
 
-      // Text Animation (Entrance)
+      // Text Animation
       gsap.fromTo(".hero-title .line", 
-        { y: 120, opacity: 0, rotateX: -20 }, 
-        { y: 0, opacity: 1, rotateX: 0, duration: 1.2, stagger: 0.15, ease: "power4.out" }
+        { y: 120, opacity: 0, rotateX: -20, transformOrigin: "0% 50% -50" }, 
+        { 
+          y: 0, 
+          opacity: 1, 
+          rotateX: 0, 
+          duration: 1.2, 
+          stagger: 0.1, 
+          ease: "power4.out",
+          force3D: true
+        }
       );
       
       // Button Animation
       gsap.fromTo(".hero-cta", 
         { scale: 0.8, opacity: 0 }, 
-        { scale: 1, opacity: 1, duration: 1, ease: "power3.out", delay: 1 }
+        { scale: 1, opacity: 1, duration: 1, ease: "power3.out", delay: 0.5, force3D: true }
       );
 
-    }, sectionRef); // Scope cleanup to this section
+    }, sectionRef);
 
-    return () => ctx.revert(); // Clean up on unmount
+    return () => ctx.revert();
   }, []);
 
   const stats = [
@@ -80,32 +84,40 @@ const HeroSection = () => {
       id="home"
       className="relative min-h-screen pt-28 md:pt-36 overflow-hidden flex flex-col items-center justify-start px-4 md:px-6 bg-[#050505]"
     >
-      {/* --- BACKGROUND TEXTURES --- */}
-      <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-[#0a0a0a] to-black z-0" />
+      {/* --- BACKGROUND TEXTURES (Optimized: content-visibility auto) --- */}
+      <div className="absolute inset-0 bg-gradient-to-b from-zinc-900 via-[#0a0a0a] to-black z-0 pointer-events-none" />
+      
+      {/* Noise Texture */}
       <div 
         className="absolute inset-0 opacity-40 pointer-events-none z-0 mix-blend-overlay"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.5'/%3E%3C/svg%3E")`,
+          transform: "translateZ(0)" // Hack to keep it on GPU
         }}
       />
+      
+      {/* Grid Texture */}
       <div 
         className="absolute inset-0 pointer-events-none z-0 opacity-[0.03]"
         style={{
           backgroundImage: `linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)`,
-          backgroundSize: '50px 50px'
+          backgroundSize: '50px 50px',
+          maskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)', // Fade out bottom for better blend
+          WebkitMaskImage: 'linear-gradient(to bottom, black 40%, transparent 100%)'
         }}
       />
-      <div className="absolute top-[-20%] left-[20%] w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full z-0 pointer-events-none" />
+      
+      <div className="absolute top-[-20%] left-[20%] w-[500px] h-[500px] bg-blue-600/20 blur-[120px] rounded-full z-0 pointer-events-none will-change-transform" />
 
       {/* --- HERO CONTENT --- */}
       <h1 className="hero-title text-center z-20 mb-12 mt-10 max-w-5xl">
         <div className="overflow-hidden mb-2">
-            <div className="line text-4xl md:text-6xl lg:text-9xl font-bold tracking-tighter text-zinc-300">
+            <div className="line text-4xl md:text-6xl lg:text-9xl font-bold tracking-tighter text-zinc-300 will-change-transform">
                 We <span style={{color:"#ff9f20"}}> Build </span> <span style={{color:"#ff9f20"}}>  Digital </span>
             </div>
         </div>
         <div className="overflow-hidden">
-            <div className="line text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter uppercase">
+            <div className="line text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter uppercase will-change-transform">
                 <span className="bg-gradient-to-b from-white via-zinc-200 to-zinc-600 bg-clip-text text-transparent drop-shadow-2xl">
                     Experiences
                 </span>
@@ -124,16 +136,22 @@ const HeroSection = () => {
       </div>
 
       {/* --- IMAGE & FLOATING STATS --- */}
-      {/* Added extra padding bottom to ensure scroll space */}
       <div ref={imageContainerRef} className="relative w-full max-w-5xl mx-auto z-10 pb-32">
         
         {/* Main Image Container */}
-        <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-zinc-900/50 backdrop-blur-sm group">
+        <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-zinc-900/50 backdrop-blur-sm group will-change-transform">
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
+            
+            {/* OPTIMIZED IMAGE LOADING */}
             <img
-            src="/images/3d.png" 
-            alt="Creative Team"
-            className="w-full h-auto object-cover opacity-90 group-hover:scale-105 transition-transform duration-1000 ease-out grayscale-[20%] hover:grayscale-0"
+              src="/images/3d.png" 
+              alt="Creative Team"
+              loading="eager" // Load immediately
+              fetchPriority="high" // Highest priority
+              decoding="async" // Don't block main thread
+              width="1024" // Provide aspect ratio hint (adjust based on real image)
+              height="600"
+              className="w-full h-auto object-cover opacity-90 group-hover:scale-105 transition-transform duration-1000 ease-out grayscale-[20%] hover:grayscale-0"
             />
         </div>
 
@@ -150,6 +168,7 @@ const HeroSection = () => {
                        border border-white/10 
                        rounded-xl p-3 min-w-[110px]
                        shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+                       will-change-transform
                        hover:border-white/20 transition-colors duration-300"
             style={{ left: "50%", top: "50%" }}
           >

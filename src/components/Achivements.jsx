@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Data bahar rakha hai taaki re-render pe recreate na ho
 const milestones = [
   {
     year: "2020",
@@ -42,20 +43,21 @@ export default function AchievementTimeline() {
   useEffect(() => {
     const container = containerRef.current;
     
-    // GSAP Context (React Best Practice for Cleanup)
     let ctx = gsap.context(() => {
       
-      // 1. Line Animation (Scroll se fill hogi)
+      // 1. OPTIMIZED LINE ANIMATION (ScaleY instead of Height)
+      // Height animation causes "Layout Thrashing" (Lag). ScaleY is GPU only.
       gsap.fromTo(lineRef.current, 
-        { height: '0%' },
+        { scaleY: 0 },
         {
-          height: '100%',
+          scaleY: 1,
           ease: 'none',
+          force3D: true, // Force GPU
           scrollTrigger: {
             trigger: container,
-            start: 'top 60%', // Jab container screen ke 60% par aaye
+            start: 'top 60%', 
             end: 'bottom 80%',
-            scrub: 1, 
+            scrub: 0.5, // Thoda smoothing add kiya jerky scroll bachane ke liye
           }
         }
       );
@@ -64,34 +66,37 @@ export default function AchievementTimeline() {
       const items = gsap.utils.toArray('.milestone-item');
       
       items.forEach((item) => {
+        // 'autoAlpha' is better than 'opacity' (sets visibility:hidden automatically)
         gsap.fromTo(item, 
-          { opacity: 0, y: 50 }, // Start State
+          { autoAlpha: 0, y: 50 }, 
           { 
-            opacity: 1, 
+            autoAlpha: 1, 
             y: 0, 
             duration: 0.8,
             ease: 'power3.out',
+            // Will-change hint browser ko pehle se batata hai
+            willChange: 'transform, opacity', 
             scrollTrigger: {
               trigger: item,
-              start: 'top 90%', // Jese hi item screen ke bottom 10% me enter karega, dikh jayega
+              start: 'top 85%', // Thoda jaldi dikhana start kiya
               toggleActions: 'play none none reverse' 
             }
           }
         );
       });
 
-    }, containerRef); // Scope selector to this component
+    }, containerRef);
 
-    return () => ctx.revert(); // Cleanup on unmount
+    return () => ctx.revert();
   }, []);
 
   return (
     <section className="bg-[#050505] py-24 px-4 overflow-hidden relative">
       
-      {/* Background Glows */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] bg-[#ff9f20]/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-[20%] right-[-10%] w-[500px] h-[500px] bg-[#0078f0]/5 rounded-full blur-[100px]" />
+      {/* Background Glows (Optimized: content-visibility) */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[20%] left-[-10%] w-[500px] h-[500px] bg-[#ff9f20]/5 rounded-full blur-[100px] will-change-transform" />
+        <div className="absolute bottom-[20%] right-[-10%] w-[500px] h-[500px] bg-[#0078f0]/5 rounded-full blur-[100px] will-change-transform" />
       </div>
 
       {/* Header */}
@@ -109,15 +114,20 @@ export default function AchievementTimeline() {
 
       <div ref={containerRef} className="max-w-6xl mx-auto relative min-h-[100vh]">
         
-        {/* --- CENTRAL LINE (The Spine) --- */}
-        {/* Grey Background Line */}
+        {/* --- CENTRAL LINE (Optimized) --- */}
+        {/* Static Background Line */}
         <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-white/10 -translate-x-1/2 rounded-full" />
         
         {/* Animated Gradient Line */}
         <div 
           ref={lineRef}
           className="absolute left-4 md:left-1/2 top-0 w-[2px] bg-gradient-to-b from-[#ff9f20] via-[#ff9f20] to-[#0078f0] -translate-x-1/2 rounded-full shadow-[0_0_15px_#ff9f20]"
-          style={{ height: '0%' }} // Initial height 0 handle by GSAP now
+          style={{ 
+            height: '100%', // Height full rakho
+            transformOrigin: 'top center', // Scale upar se niche hoga
+            transform: 'scaleY(0)', // Initially 0
+            willChange: 'transform' // Browser hint
+          }} 
         />
 
         {/* --- MILESTONE CARDS --- */}
@@ -128,7 +138,6 @@ export default function AchievementTimeline() {
               <div 
                 key={i} 
                 className={`milestone-item relative flex flex-col md:flex-row items-center ${isEven ? 'md:flex-row-reverse' : ''}`}
-                // Initial opacity styling handled by GSAP, but kept visible for fallback
                 style={{ opacity: 0 }} 
               >
                 
@@ -147,19 +156,22 @@ export default function AchievementTimeline() {
                   </div>
                 </div>
 
-                {/* 2. CENTER DOT (The Connector) */}
+                {/* 2. CENTER DOT */}
                 <div className="absolute left-4 md:left-1/2 -translate-x-1/2 flex items-center justify-center w-8 h-8 rounded-full bg-[#050505] border-2 border-white/20 z-20 shadow-[0_0_10px_black]">
                   <div className={`w-3 h-3 rounded-full ${i % 2 === 0 ? 'bg-[#ff9f20]' : 'bg-[#0078f0]'} animate-pulse`} />
                 </div>
 
-                {/* 3. IMAGE SIDE */}
+                {/* 3. IMAGE SIDE (Optimized) */}
                 <div className="flex-1 w-full pl-12 md:pl-0 md:px-12">
-                  <div className="relative rounded-2xl overflow-hidden aspect-video group border border-white/10 shadow-2xl">
+                  <div className="relative rounded-2xl overflow-hidden aspect-video group border border-white/10 shadow-2xl transform-gpu">
                     <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all duration-500 z-10" />
                     <img 
                       src={item.img} 
                       alt={item.title} 
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0"
+                      loading="lazy" // Lazy Load added
+                      width="600"    // Explicit dimensions prevent layout shift
+                      height="337"
+                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 grayscale group-hover:grayscale-0 will-change-transform"
                     />
                     {/* Year badge for Mobile */}
                     <div className="md:hidden absolute bottom-4 left-4 bg-black/60 backdrop-blur-md px-3 py-1 rounded-md text-white font-bold text-sm border border-white/10">
