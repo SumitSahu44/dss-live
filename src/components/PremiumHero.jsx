@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 
 const HeroSection = () => {
   const sectionRef = useRef(null);
@@ -30,7 +30,23 @@ const HeroSection = () => {
     loadGsap();
   }, []);
 
-  // --- 2. ANIMATION LOGIC ---
+  // --- 2. COORDINATES (Tighter & Inside Image Area) ---
+  const stats = useMemo(() => {
+    // Coordinates ko image ke center ke pass rakha hai (Max X: 340, Max Y: 150)
+    // Isse wo image box se bahar nahi jayenge.
+    return [
+        { number: "500+", label: "Happy Clients", x: -280, y: -190 }, // Top Left
+        { number: "8+", label: "Years Exp.", x: 280, y: -200 },       // Top Right
+        
+        { number: "320+", label: "Projects", x: -340, y: -40 },        // Mid Left (Wider)
+        { number: "10+", label: "Global", x: 340, y: -50 },            // Mid Right (Wider)
+        
+        { number: "₹20Cr", label: "Revenue", x: -220, y: 100 },       // Bottom Left (Closer)
+        { number: "4.9", label: "Rating", x: 220, y: 100 },           // Bottom Right (Closer)
+    ];
+  }, []);
+
+  // --- 3. ANIMATION LOGIC ---
   useEffect(() => {
     if (!isGsapReady || !sectionRef.current) return;
 
@@ -38,92 +54,71 @@ const HeroSection = () => {
     const ScrollTrigger = window.ScrollTrigger;
     gsap.registerPlugin(ScrollTrigger);
 
-    const stats = statsRef.current;
+    const statsEls = statsRef.current;
 
     let ctx = gsap.context(() => {
       
-      // 1. Initial Setup for Stats (Center them)
-      gsap.set(stats, {
-        x: 0,
-        y: 0,
-        scale: 0.5,
+      // 1. Initial Setup: Sabko CENTER me chupao (Scale 0)
+      gsap.set(statsEls, {
+        x: 0, 
+        y: 0, 
+        scale: 0, 
         opacity: 0,
-        xPercent: -50,
+        xPercent: -50, 
         yPercent: -50,
-        position: "absolute",
-        left: "50%",
+        position: "absolute", 
+        left: "50%", 
         top: "50%",
       });
 
-      // 2. STATS EXPLOSION
+      // 2. EXPLOSION ANIMATION (Center se bahar nikalna)
       const statsTl = gsap.timeline({
         scrollTrigger: {
           trigger: imageContainerRef.current,
-          start: "top 85%", 
+          start: "top 75%", // Jaise hi image view me aayegi
         }
       });
 
-      statsTl.to(stats, {
-        x: (i, target) => target.dataset.finalX,
+      statsTl.to(statsEls, {
+        x: (i, target) => target.dataset.finalX, // Apni-apni jagah jao
         y: (i, target) => target.dataset.finalY,
         scale: 1,
         opacity: 1,
-        duration: 1.2,
-        stagger: 0.05,
-        ease: "elastic.out(1, 0.75)", 
+        duration: 1.4,
+        stagger: 0.08, // Ek ke baad ek niklenge
+        ease: "elastic.out(1, 0.6)", // Bouncy effect
         force3D: true,
       });
 
-      // 3. CONTINUOUS FLOATING
-      stats.forEach((stat, i) => {
+      // 3. GENTLE FLOATING (Bahar nikalne ke baad halka sa hilna)
+      statsEls.forEach((stat, i) => {
         gsap.to(stat, {
-          y: `+=${15}`, 
-          duration: 2 + (i * 0.2), 
+          y: `+=${8 + Math.random() * 5}`, // Bohat subtle movement (8-13px)
+          x: `+=${3 + Math.random() * 3}`, // Thoda sa left-right bhi
+          duration: 2 + Math.random(), 
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
-          delay: 1.2 + (i * 0.1),
+          delay: 1.4 + (i * 0.1), // Explosion ke baad start hoga
         });
       });
 
-      // 4. CREATIVE TITLE ANIMATION
+      // 4. Hero Title Animation
       gsap.fromTo(".hero-title .char-line", 
-        { 
-          y: 150, 
-          skewY: 7, 
-          opacity: 0 
-        }, 
-        { 
-          y: 0, 
-          skewY: 0,
-          opacity: 1, 
-          duration: 1.5, 
-          stagger: 0.15, 
-          ease: "power4.out",
-          force3D: true
-        }
+        { y: 100, opacity: 0, rotateX: -20 }, 
+        { y: 0, opacity: 1, rotateX: 0, duration: 1.2, stagger: 0.1, ease: "power3.out" }
       );
       
       // 5. Button Animation
       gsap.fromTo(".hero-cta", 
-        { scale: 0.8, opacity: 0, y: 30 }, 
-        { scale: 1, opacity: 1, y: 0, duration: 1, ease: "back.out(1.7)", delay: 0.8 }
+        { scale: 0.9, opacity: 0, y: 20 }, 
+        { scale: 1, opacity: 1, y: 0, duration: 0.8, ease: "back.out(1.5)", delay: 0.6 }
       );
 
     }, sectionRef);
 
     return () => ctx.revert();
-  }, [isGsapReady]);
-
-  // UPDATED COORDINATES: More Gap & Spread
-  const stats = [
-    { number: "500+", label: "Happy Clients", x: -450, y: -240 }, // Top Left (Further out)
-    { number: "8+", label: "Years Exp.", x: 450, y: -240 },       // Top Right (Further out)
-    { number: "₹20Cr", label: "Revenue", x: -450, y: 240 },       // Bottom Left (Lower)
-    { number: "320+", label: "Projects", x: 450, y: 240 },        // Bottom Right (Lower)
-    { number: "10+", label: "Global", x: -600, y: 0 },            // Far Left
-    { number: "4.9", label: "Rating", x: 600, y: 0 },             // Far Right
-  ];
+  }, [isGsapReady, stats]);
 
   return (
     <section
@@ -146,7 +141,6 @@ const HeroSection = () => {
 
       {/* --- CREATIVE HERO CONTENT --- */}
       <h1 className="hero-title text-center z-20 mb-12 max-w-6xl relative">
-        {/* Decorative Tag */}
         <div className="flex justify-center mb-6 overflow-hidden">
              <div className="hero-cta inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md text-[10px] uppercase tracking-widest text-[#ff9f20] opacity-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#ff9f20] animate-pulse" />
@@ -154,7 +148,6 @@ const HeroSection = () => {
              </div>
         </div>
 
-        {/* Masked Lines for Skew Animation */}
         <div className="overflow-hidden">
             <div className="char-line block text-5xl md:text-7xl lg:text-[7rem] font-bold tracking-tighter text-zinc-300 leading-[1.1]">
                 We <span style={{color:"#0078f0"}} className="italic font-serif">Craft</span> Digital
@@ -187,6 +180,9 @@ const HeroSection = () => {
       {/* --- IMAGE & FLOATING STATS --- */}
       <div ref={imageContainerRef} className="relative w-full max-w-6xl mx-auto z-10 pb-32">
         
+        {/* Glow behind image */}
+        {/* <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div> */}
+
         {/* Main Image Container */}
         <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-zinc-900/50 backdrop-blur-sm group will-change-transform aspect-[16/9] md:aspect-[21/9]">
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
@@ -199,7 +195,7 @@ const HeroSection = () => {
             />
         </div>
 
-        {/* Floating Stats - Updated Positioning */}
+        {/* Floating Stats - Glassmorphism & Tighter Positioning */}
         {stats.map((stat, i) => (
           <div
             key={i}
@@ -208,27 +204,31 @@ const HeroSection = () => {
             data-final-y={stat.y}
             className="hidden md:flex flex-col items-center justify-center
                        absolute z-[50] 
-                       bg-[#0a0a0a]/80 backdrop-blur-md 
-                       border border-white/10 hover:border-[#0078f0]/50
-                       rounded-2xl p-4 min-w-[140px]
-                       shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]
-                       will-change-transform
-                       transition-colors duration-300 opacity-0"
+                       /* Glass Style */
+                       bg-white/5 backdrop-blur-xl 
+                       border border-white/10 hover:border-white/20
+                       rounded-2xl p-4 min-w-[130px]
+                       shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
+                       will-change-transform cursor-default
+                       opacity-0"
             style={{ left: "50%", top: "50%" }}
           >
-            <div className="text-3xl font-black text-white tracking-tight drop-shadow-sm">
+            <div className="text-2xl font-black text-white tracking-tight drop-shadow-md">
               {stat.number}
             </div>
             <div className="text-zinc-400 font-bold text-[10px] tracking-widest uppercase mt-1">
               {stat.label}
             </div>
+            
+            {/* Subtle bottom highlight */}
+            <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
           </div>
         ))}
 
-        {/* Mobile Stats Grid */}
+        {/* Mobile Stats Grid (Simple Layout) */}
         <div className="md:hidden grid grid-cols-2 gap-3 mt-8 px-4">
           {stats.map((stat, i) => (
-            <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+            <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4 text-center backdrop-blur-md">
               <div className="text-2xl font-bold text-white">{stat.number}</div>
               <div className="text-zinc-500 text-[10px] uppercase tracking-wider mt-1">{stat.label}</div>
             </div>
