@@ -58,8 +58,8 @@ export default function Footer() {
 
          {/* MASSIVE BACKGROUND TEXT */}
          <div className="footer-bg-text absolute bottom-0 left-0 w-full text-center pointer-events-none select-none overflow-hidden">
-            <h1 className="text-[18vw] md:text-[20vw] font-black text-white/[0.02] leading-none tracking-tighter">
-               AGENCY
+            <h1 className="text-[25vw] font-black text-white/[0.02] leading-none tracking-tighter">
+               DSS
             </h1>
          </div>
       </div>
@@ -87,40 +87,33 @@ export default function Footer() {
 
         {/* --- 2. MAIN GRID LINKS --- */}
         {/* Mobile: 2 Columns Grid | Desktop: 12 Column Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-12 gap-8 md:gap-8 mb-16 md:mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 mb-16 md:mb-24">
            
-           {/* Column 1: Brand Info (Full width on mobile for newsletter space) */}
-           <div className="col-span-2 md:col-span-4 flex flex-col gap-6">
-              <div className="text-2xl font-black tracking-tighter">
-                 AGENCY<span className="text-[#0078f0]">.</span>
+           {/* Column 1: Brand Info (Full width on mobile) */}
+           <div className="col-span-1 md:col-span-4 flex flex-col gap-6">
+              <div className="text-2xl font-black tracking-tighter uppercase">
+                 DSS<span className="text-[#0078f0]">.</span>
               </div>
               <p className="text-gray-500 text-sm leading-relaxed max-w-xs">
-                 We are a digital innovation agency crafting world-class experiences for brands that dare to lead.
+                 DSS Digital Success Solutions LLP. We are a digital innovation agency crafting world-class experiences.
               </p>
               
-              {/* Newsletter */}
-              <div className="mt-2">
-                 <p className="text-xs uppercase tracking-widest text-white mb-3">Subscribe to Insights</p>
-                 <div className="flex gap-2">
-                    <input 
-                      type="email" 
-                      placeholder="Email Address" 
-                      className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#0078f0] transition-colors w-full"
-                    />
-                    <button className="bg-white/10 hover:bg-[#0078f0] text-white px-4 py-3 rounded-lg transition-colors">
-                       →
-                    </button>
-                 </div>
+              {/* Address Section */}
+              <div className="mt-2 text-gray-400 text-sm leading-relaxed">
+                <p className="font-bold text-white mb-1 uppercase tracking-wider text-xs">Headquarters</p>
+                <p>PLOT NO. 22, Scheme No 53,</p>
+                <p>Vijay Nagar, Indore,</p>
+                <p>Madhya Pradesh – 452010</p>
               </div>
            </div>
 
-           {/* Column 2: Sitemap (Half width on mobile) */}
+           {/* Column 2: Sitemap */}
            <div className="col-span-1 md:col-span-2 md:col-start-6">
               <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4 md:mb-6">Explore</h4>
               <ul className="flex flex-col gap-3 md:gap-4 text-gray-400 text-sm">
-                 {['Work', 'Services', 'Agency', 'Careers', 'Contact'].map(item => (
+                 {['Home', 'Work', 'Services','Insights', 'Contact'].map(item => (
                     <li key={item}>
-                       <a href="#" className="hover:text-[#ff9f20] transition-colors flex items-center gap-2 group">
+                       <a href={`#${item.toLowerCase()}`}  className="hover:text-[#ff9f20] transition-colors flex items-center gap-2 group">
                           <span className="w-0 group-hover:w-2 h-[1px] bg-[#ff9f20] transition-all duration-300" />
                           {item}
                        </a>
@@ -129,11 +122,11 @@ export default function Footer() {
               </ul>
            </div>
 
-           {/* Column 3: Services (Half width on mobile) */}
+           {/* Column 3: Services */}
            <div className="col-span-1 md:col-span-3">
               <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4 md:mb-6">Services</h4>
               <ul className="flex flex-col gap-3 md:gap-4 text-gray-400 text-sm">
-                 {['Brand Strategy', 'UI/UX Design', 'Web Development', 'Growth Marketing', 'Content Creation'].map(item => (
+                 {['Website Development', 'Digital Marketing', 'Social Media Management', 'SEO Optimization', 'Branding & Designing'].map(item => (
                     <li key={item}>
                        <a href="#" className="hover:text-[#0078f0] transition-colors">
                           {item}
@@ -143,14 +136,33 @@ export default function Footer() {
               </ul>
            </div>
 
-           {/* Column 4: Contact & Socials (Full width on mobile for balance) */}
-           <div className="col-span-2 md:col-span-3">
+           {/* Column 4: Contact & Socials */}
+           <div className="col-span-1 md:col-span-3">
               <h4 className="text-sm font-bold uppercase tracking-widest text-white mb-4 md:mb-6">Connect</h4>
-              <p className="text-gray-400 text-sm mb-1">hello@agency.com</p>
-              <p className="text-gray-400 text-sm mb-6">+1 (555) 123-4567</p>
               
+              {/* Emails */}
+              <div className="flex flex-col gap-1 mb-6">
+                  <a href="mailto:Info@digitalsuccesssolutions.in" className="text-gray-400 hover:text-[#0078f0] transition-colors text-sm break-all">
+                    Info@digitalsuccesssolutions.in
+                  </a>
+                  <a href="mailto:business@digitalsuccesssolutions.in" className="text-gray-400 hover:text-[#0078f0] transition-colors text-sm break-all">
+                    business@digitalsuccesssolutions.in
+                  </a>
+              </div>
+
+              {/* Phones */}
+              <div className="flex flex-col gap-1 mb-6">
+                <a href="tel:+916264398990" className="text-white hover:text-[#ff9f20] transition-colors font-mono">
+                    +91 62643 98990
+                </a>
+                <a href="tel:+918718980114" className="text-white hover:text-[#ff9f20] transition-colors font-mono">
+                    +91 87189 80114
+                </a>
+              </div>
+              
+              {/* Social Icons */}
               <div className="flex gap-4">
-                 {['Li', 'Tw', 'In', 'Be'].map((social, i) => (
+                 {['Li', 'Tw', 'In', 'Fb'].map((social, i) => (
                     <a key={i} href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-xs font-bold text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/30 transition-all">
                        {social}
                     </a>
@@ -163,13 +175,15 @@ export default function Footer() {
         {/* --- 3. BOTTOM BAR (Legal) --- */}
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-xs text-gray-600 font-mono uppercase tracking-wider gap-4 md:gap-0">
            <div className="flex gap-6">
-              <span>© 2024 Agency Inc.</span>
+              <span>© 2024 DSS Digital Success Solutions LLP</span>
            </div>
            
            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
               <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
               <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
-              <a href="#" className="hover:text-white transition-colors">Cookie Policy</a>
+              <a href="https://www.digitalsuccesssolutions.in" target="_blank" rel="noreferrer" className="hover:text-[#0078f0] transition-colors">
+                www.digitalsuccesssolutions.in
+              </a>
            </div>
         </div>
 

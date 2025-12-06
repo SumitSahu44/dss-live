@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import gsap from 'https://esm.sh/gsap';
 import { ScrollTrigger } from 'https://esm.sh/gsap/ScrollTrigger';
 import { MapPin, ArrowUpRight, Users, Monitor, Briefcase, Trophy } from 'lucide-react';
-
+import { HashLink } from "react-router-hash-link";
 gsap.registerPlugin(ScrollTrigger);
 
 const stats = [
@@ -107,10 +107,14 @@ export default function AboutSection() {
                     From crafting your first pixel-perfect website to managing multi-crore ad budgets, we are the engine behind your digital dominance. We turn casual visitors into loyal customers.
                 </p>
 
-              <button className="reveal-text group relative px-8 py-3 bg-white text-black font-bold uppercase text-xs tracking-widest rounded-full overflow-hidden hover:scale-105 transition-transform duration-300">
-                    <span className="relative z-10 group-hover:text-white transition-colors">Explore our Works</span>
-                    <div className="absolute inset-0 bg-[#0078f0] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-                </button>
+         <HashLink smooth to="/#work">
+  <button className="reveal-text group relative px-8 py-3 bg-white text-black font-bold uppercase text-xs tracking-widest rounded-full overflow-hidden hover:scale-105 transition-transform duration-300">
+    <span className="relative z-10 group-hover:text-white transition-colors">
+      Explore our Works
+    </span>
+    <div className="absolute inset-0 bg-[#0078f0] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+  </button>
+</HashLink>
                
             </div>
 

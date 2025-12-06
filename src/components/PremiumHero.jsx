@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { HashLink } from "react-router-hash-link";
 
 const HeroSection = () => {
+ 
   const sectionRef = useRef(null);
   const imageContainerRef = useRef(null);
   const statsRef = useRef([]);
@@ -168,13 +171,19 @@ const HeroSection = () => {
       </h1>
 
       <div className="hero-cta z-20 mb-24 relative opacity-0">
-        <button className="group relative px-10 py-4 bg-white text-black font-bold text-sm uppercase tracking-widest rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.4)]">
-          <div className="absolute inset-0 bg-[#0078f0] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-          <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
-            Start Your Journey
-            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-          </span>
-        </button>
+    
+<HashLink smooth to="/#contact">
+  <button className="group relative px-10 py-4 bg-white text-black font-bold text-sm uppercase tracking-widest rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.4)]">
+    <div className="absolute inset-0 bg-[#0078f0] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+    <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
+      Start Your Journey
+      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+      </svg>
+    </span>
+  </button>
+</HashLink>
+
       </div>
 
       {/* --- IMAGE & FLOATING STATS --- */}

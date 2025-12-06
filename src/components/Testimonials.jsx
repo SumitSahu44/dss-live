@@ -7,46 +7,74 @@ gsap.registerPlugin(ScrollTrigger);
 
 const reviews = [
   {
-    name: "Amit Verma",
-    role: "Founder, TechGrow",
-    content: "Digital Success Solutions transformed our online presence. Our leads increased by 200% in just 3 months. Truly the best in Indore!",
+    name: "Rohit Mehra",
+    role: "Founder, LithoVeda",
+    content: "LithoVeda ki website aur branding inhone next level bana di. Engagement 3x ho gaya and sale bhi boost hui. Highly satisfied!",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100"
+    img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&q=80&w=200"
   },
   {
-    name: "Sneha Kapoor",
-    role: "Marketing Head, Aura Fashion",
-    content: "Their branding strategy gave us a completely new identity. The team is creative, responsive, and data-driven.",
+    name: "Priya Nivedita",
+    role: "Marketing Lead, JeevanShaadi.com",
+    content: "Digital campaigns bahut hi targeted the. Leads quality improve hui and conversion rate almost double ho gaya.",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100"
+    img: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&q=80&w=200"
   },
   {
-    name: "Rahul Sharma",
-    role: "CEO, Foodies Hub",
-    content: "We needed a robust e-commerce platform, and they delivered beyond expectations. The UI is sleek and sales are booming.",
+    name: "Aakash Rathore",
+    role: "CEO, FitoraShop",
+    content: "Inhone hamara e-commerce store completely optimize kar diya. Page speed, UI & SEO — sab improve hua. Sales boost clearly dikhti hai.",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100"
+    img: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&q=80&w=200"
   },
   {
-    name: "Priya Singh",
-    role: "Director, EduSmart",
-    content: "ROI-driven campaigns that actually work. They stopped our budget leakage and started generating real revenue.",
+    name: "Suman Verma",
+    role: "Owner, SadaBahar Handloom",
+    content: "Branding aur photoshoot ka kaam top-class tha. Handloom ki authenticity bilkul sahi tarike se represent hui.",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80&w=100"
+    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=200"
   },
   {
-    name: "Vikram Malhotra",
-    role: "Founder, BuildRight",
-    content: "Professional, punctual, and innovative. They handle our SEO and Social Media effortlessly. Highly recommended!",
+    name: "Nikhil Sharma",
+    role: "Director, Edmirai",
+    content: "Hamare learning platform ki complete digital strategy banai. Result measurable tha and user base fast grow hua.",
+    rating: 5,
+    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=200"
+  },
+  {
+    name: "Ananya Gupta",
+    role: "Co-Founder, MixNuts.in",
+    content: "Packaging design, branding aur ads sab super creative the. ROAS 4x tak pahunch gaya. Amazing team!",
+    rating: 5,
+    img: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=200"
+  },
+  {
+    name: "Piyush Sanwaliya",
+    role: "Artist, PiyushSanwaliyaArt.com",
+    content: "Mere art portfolio ko itna professional bana diya ki clients directly website se book karne lage. Loved the UI.",
+    rating: 5,
+    img: "https://images.unsplash.com/photo-1552058544-f2b08422138a?auto=format&fit=crop&q=80&w=200"
+  },
+  {
+    name: "Rupnit Kaur",
+    role: "Founder, Rupnit Photography Production",
+    content: "Website ka design cinematic and premium lagta hai. SEO ke baad enquiries kaafi increase ho gayi.",
+    rating: 5,
+    img: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&q=80&w=200"
+  },
+  {
+    name: "Harsh Thakur",
+    role: "Co-Founder, Himbhavy",
+    content: "Inhone hamare organic product brand ka digital presence strong bana diya. Social media growth excellent thi.",
     rating: 4,
-    img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=100"
+    img: "https://images.unsplash.com/photo-1541534401786-2077d221aa47?auto=format&fit=crop&q=80&w=200"
   },
   {
-    name: "Anjali Desai",
-    role: "Co-Founder, GreenLife",
-    content: "The best digital partner we've worked with. Their storytelling approach helped us connect with our audience on a deeper level.",
+    name: "Riya Jain",
+    role: "Owner, LittleNappy.in",
+    content: "Baby products niche ke liye perfect branding strategy mili. Visuals soft, clean aur premium the. Parents trust easily build hua.",
     rating: 5,
-    img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100"
+    img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80&w=200"
   }
 ];
 

@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react'
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 // --- 1. CRITICAL COMPONENTS (Load immediately for fast First Paint) ---
 import CustomCursor from './components/CustomCursor.jsx'
 import Navbar from './components/Navbar.jsx'
@@ -29,20 +29,20 @@ const App = () => {
 
   // Optional: Agar aapne Lenis install nahi kiya hai to 'npm i @studio-freight/lenis' karein.
   // Ye fast scrolling pe white screen issue ko 90% fix kar deta hai.
-  /*
-  useEffect(() => {
-    const lenis = new Lenis()
-    function raf(time) {
-      lenis.raf(time)
-      requestAnimationFrame(raf)
+  
+ useEffect(() => {
+  const hash = window.location.hash;
+  if (hash) {
+    const element = document.querySelector(hash);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
     }
-    requestAnimationFrame(raf)
-  }, [])
-  */
-
+  }
+}, []);
+  
   return (
     <>
-  
+    <BrowserRouter>
     <Preloader />
     
     <div className="w-full overflow-hidden bg-[#f5f2eb]"> 
@@ -67,7 +67,7 @@ const App = () => {
       </Suspense>
     </div>
       
-    
+    </BrowserRouter>
     </>
   )
 }

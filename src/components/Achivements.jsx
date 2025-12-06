@@ -102,7 +102,7 @@ export default function WorkingProcess() {
   }, []);
 
   return (
-    <section className="bg-[#050505] py-24 px-4 overflow-hidden relative">
+    <section className="bg-[#050505] py-24 px-4 overflow-hidden relative" id="insights">
       
       {/* Background Glows */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
