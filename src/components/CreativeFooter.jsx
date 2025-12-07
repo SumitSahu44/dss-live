@@ -1,7 +1,9 @@
 import React, { useEffect, useRef } from "react";
+
 // Using CDN imports for GSAP
 import gsap from "https://esm.sh/gsap";
 import { ScrollTrigger } from "https://esm.sh/gsap/ScrollTrigger";
+import { Link } from "react-router-dom";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -179,8 +181,8 @@ export default function Footer() {
            </div>
            
            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+             <Link to="/Privacy-Policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+             <Link to="/TermsAndConditions" className="hover:text-white transition-colors">Terms of Service</Link>
               <a href="https://www.digitalsuccesssolutions.in" target="_blank" rel="noreferrer" className="hover:text-[#0078f0] transition-colors">
                 www.digitalsuccesssolutions.in
               </a>

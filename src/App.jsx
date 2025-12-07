@@ -6,7 +6,7 @@ import Navbar from './components/Navbar.jsx'
 import PremiumHero from './components/PremiumHero.jsx'
 import TestimonialSection from './components/Testimonials.jsx'
 import Preloader from './components/Preloader.jsx'
-
+import { Link } from "react-router-dom";
 // --- 2. LAZY LOAD HEAVY COMPONENTS (Load only when needed) ---
 // Isse initial bundle size kam hoga aur browser hang nahi karega
 const DssAbout = React.lazy(() => import('./components/DssAbout.jsx'))
@@ -20,6 +20,8 @@ const UGCTestimonials = React.lazy(() => import('./components/UGCTestimonials.js
 const ContactSection = React.lazy(() => import('./components/ContactSection.jsx'))
 const CreativeFooter = React.lazy(() => import('./components/CreativeFooter.jsx'))
 
+const PrivacyPolicy = React.lazy(() => import('./components/PrivacyPolicy.jsx'))
+const TermsAndConditions = React.lazy(() => import('./components/TermsAndConditions.jsx'))
 // --- Simple Loading Fallback ---
 const Loader = () => (
   <div style={{ height: '20vh', width: '100%', background: '#f5f2eb' }}></div>
@@ -42,32 +44,44 @@ const App = () => {
   
   return (
     <>
-    <BrowserRouter>
-    <Preloader />
-    
-    <div className="w-full overflow-hidden bg-[#f5f2eb]"> 
+   <BrowserRouter>
+      <Preloader />
       <CustomCursor />
       <Navbar />
-      <PremiumHero />
 
-      {/* Suspense wrapper heavy components ko handle karega */}
-      <Suspense fallback={<Loader />}>
-        <DssAbout />
-         <Deconstructed />
-        <AchievementTimeline />
-       
-        {/* <ZeroToHeroScroll /> */}
-        <PortfolioShowcase />
-        <NewVisionMission />
-         <Clients />
-        <UGCTestimonials />
-        <TestimonialSection />
-        <ContactSection />
-        <CreativeFooter />
-      </Suspense>
-    </div>
+      <Routes>
+        {/* Home Page */}
+        <Route
+          path="/"
+          element={
+            <div className="w-full overflow-hidden bg-[#f5f2eb]">
+              <PremiumHero />
+
+              <Suspense fallback={<Loader />}>
+                <DssAbout />
+                <Deconstructed />
+                <AchievementTimeline />
+                <PortfolioShowcase />
+                <NewVisionMission />
+                <Clients />
+                <UGCTestimonials />
+                <TestimonialSection />
+                <ContactSection />
+              </Suspense>
+            </div>
+          }
+        />
+
+        {/* Privacy Policy Page */}
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+         <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
+      </Routes>
+
+      <CreativeFooter />
+
       
-    </BrowserRouter>
+</BrowserRouter>
+
     </>
   )
 }
