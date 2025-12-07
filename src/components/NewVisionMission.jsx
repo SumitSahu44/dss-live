@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react';
-// Fixing imports by using CDN links since local node_modules are not available
 import gsap from 'https://esm.sh/gsap';
 import { ScrollTrigger } from 'https://esm.sh/gsap/ScrollTrigger';
 
@@ -9,48 +8,40 @@ export default function VisionMissionReveal() {
   const containerRef = useRef(null);
   const missionSectionRef = useRef(null);
   const visionContentRef = useRef(null);
-  const missionContentRef = useRef(null);
 
   useEffect(() => {
     const container = containerRef.current;
     const missionSection = missionSectionRef.current;
+    const visionContent = visionContentRef.current;
     
     let ctx = gsap.context(() => {
       
-      // 1. MAIN SCROLL LOGIC
+      // SINGLE TIMELINE (Sab kuch ek saath control hoga)
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
           start: 'top top',
-          end: '+=250%', // Increased Duration (Old was 150%, New is 250% for fixing overlap)
+          end: '+=200%', // Scroll distance thoda adjust kiya for better feel
           pin: true,
-          scrub: 1,
+          scrub: 1, // Smoothness ke liye
           anticipatePin: 1
         }
       });
 
-      // --- PHASE 1: HOLD VISION (The Fix) ---
-      // Empty animation to keep Vision visible for a while before Mission slides in
-      tl.to({}, { duration: 0.5 }); 
-
-      // --- PHASE 2: MISSION SLIDE-IN ---
-      tl.to(missionSection, {
-        x: '0%', // Slide from Right to Center
-        ease: 'power2.inOut',
-        duration: 1.5 // Smooth Slide
-      });
-
-      // 3. PARALLAX TEXT EFFECT
-      gsap.to(visionContentRef.current, {
-        opacity: 0.5,
-        scale: 0.95,
-        scrollTrigger: {
-          trigger: container,
-          start: 'top top',
-          end: '+=100%',
-          scrub: 1
-        }
-      });
+      // Animation Steps:
+      // Jaise hi scroll start hoga, Vision thoda fade/scale hoga aur Mission aana shuru hoga
+      
+      tl.to(visionContent, {
+        scale: 0.9,       // Thoda piche bhejne ka effect
+        opacity: 0.2,     // Dheere dheere gayab
+        duration: 1,
+        ease: "power1.out"
+      })
+      .to(missionSection, {
+        x: '0%',          // Right se center slide
+        ease: "power1.inOut", 
+        duration: 1       // Vision ke fade hone ke saath hi ye slide hoga
+      }, "<");            // symbol "<" ka matlab hai: Previous animation ke saath start karo
 
     }, container);
 
@@ -58,22 +49,22 @@ export default function VisionMissionReveal() {
   }, []);
 
   return (
-    <div className="bg-black">
+    <div className="bg-black" id="visionmission">
       
       {/* --- MAIN CONTAINER (Pinned) --- */}
       <div ref={containerRef} className="relative h-screen w-full overflow-hidden">
 
         {/* =========================================
-            LAYER 1: OUR VISION (Base Layer - Original Design) 
+            LAYER 1: OUR VISION (Base Layer) 
            ========================================= */}
         <div className="absolute inset-0 w-full h-full bg-[#050505] flex items-center justify-center p-8 md:p-20">
           
-          {/* Background Decor (Blue Glow) */}
+          {/* Background Decor */}
           <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#0078f0]/10 blur-[150px] rounded-full pointer-events-none" />
           
-          <div ref={visionContentRef} className="relative z-10 grid md:grid-cols-2 gap-12 max-w-7xl w-full items-center">
+          {/* Ref added here for animation */}
+          <div ref={visionContentRef} className="relative z-10 grid md:grid-cols-2 gap-12 max-w-7xl w-full items-center origin-center">
             
-            {/* Left: Huge Heading */}
             <div className="space-y-6">
               <h2 className="text-[#0078f0] font-bold tracking-widest uppercase text-sm">The Dream</h2>
               <h1 className="text-6xl md:text-8xl font-bold text-white leading-none">
@@ -83,7 +74,6 @@ export default function VisionMissionReveal() {
               <div className="h-2 w-32 bg-[#0078f0] rounded-full mt-4" />
             </div>
 
-            {/* Right: Content (Original Full Text) */}
             <div className="text-gray-300 text-lg md:text-xl leading-relaxed space-y-6 border-l border-white/10 pl-8">
               <p>
                 To build a future where every startup, small business, and growing brand in India 
@@ -94,17 +84,10 @@ export default function VisionMissionReveal() {
                 Many young businesses never reach their true potential because they cannot afford 
                 the level of digital presence and branding they need.
               </p>
-              <p className="text-white font-medium">
-                Our vision is to remove that barrier.
-              </p>
-              <p className="text-sm text-gray-500 italic">
-                Contributing to a stronger, more connected Digital India.
-              </p>
             </div>
 
           </div>
           
-          {/* Big Background Watermark */}
           <h1 className="absolute bottom-[-5%] left-[-5%] text-[20vw] font-black text-white/[0.02] pointer-events-none select-none">
             VISION
           </h1>
@@ -112,7 +95,7 @@ export default function VisionMissionReveal() {
 
 
         {/* =========================================
-            LAYER 2: OUR MISSION (Sliding Panel - Original Design) 
+            LAYER 2: OUR MISSION (Sliding Panel) 
            ========================================= */}
         <div 
           ref={missionSectionRef}
@@ -121,28 +104,21 @@ export default function VisionMissionReveal() {
              boxShadow: '-50px 0 100px rgba(0,0,0,0.5)'
           }}
         >
-          {/* Decorative Pattern */}
           <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-multiply" />
 
-          <div ref={missionContentRef} className="relative z-10 grid md:grid-cols-2 gap-12 max-w-7xl w-full items-center">
+          <div className="relative z-10 grid md:grid-cols-2 gap-12 max-w-7xl w-full items-center">
             
-            {/* Left: Content (Swapped for balance) */}
             <div className="order-2 md:order-1 text-gray-900 text-lg md:text-xl leading-relaxed space-y-6 border-l-4 border-black pl-8">
               <p className="font-bold text-2xl">
-                Our mission is to create real impact, not just complete projects.
+                Our mission is to create real impact.
               </p>
               <p>
-                We focus on supporting early-stage entrepreneurs who want to build something meaningful 
-                but struggle with the high cost of marketing. Through impactful websites, 
-                performance-driven marketing, and thoughtful branding.
-              </p>
-              <p>
+                We focus on supporting early-stage entrepreneurs who want to build something meaningful. 
                 Our goal is to empower Indian businesses, strengthen the startup ecosystem, 
-                and contribute to the vision of <strong className="underline decoration-black">Startup India</strong>.
+                and contribute to <strong className="underline decoration-black">Startup India</strong>.
               </p>
             </div>
 
-            {/* Right: Huge Heading */}
             <div className="order-1 md:order-2 space-y-6 text-right">
               <h2 className="text-black/60 font-bold tracking-widest uppercase text-sm">The Action</h2>
               <h1 className="text-6xl md:text-8xl font-black text-black leading-none">
@@ -154,7 +130,6 @@ export default function VisionMissionReveal() {
 
           </div>
 
-          {/* Big Background Watermark */}
           <h1 className="absolute top-[-5%] right-[-5%] text-[20vw] font-black text-black/[0.05] pointer-events-none select-none">
             MISSION
           </h1>
@@ -162,7 +137,6 @@ export default function VisionMissionReveal() {
         </div>
 
       </div>
-
     </div>
   );
 }

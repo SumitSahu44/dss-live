@@ -24,7 +24,7 @@ const services = [
   },
   {
     id: "03",
-    title: "Social Media Mgmt",
+    title: "Social Media",
     desc: "Professional social media solutions designed to grow your brand and engage your audience. We amplify your presence across platforms.",
     icon: Share2,
     theme: "from-pink-900 via-pink-950 to-black",
@@ -139,13 +139,14 @@ export default function ServicesSection() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
-          start: "top top",
-          // Length adjusted for comfortable scrolling speed
-          end: `+=${totalCards * 120}%`, 
-          pin: true,
-          scrub: 1, // '1' feels buttery and professional. '2' was too laggy.
-          anticipatePin: 1,
-          fastScrollEnd: true,
+  start: "top top",
+  end: `+=${totalCards * 120}%`,
+  pin: true,
+  scrub: 0.8,          // ✅ less lag
+  anticipatePin: 1,
+  fastScrollEnd: true,
+  preventOverlaps: true,
+  invalidateOnRefresh: true,
           // Removed 'snap' as requested for manual control
 
           onUpdate: (self) => {

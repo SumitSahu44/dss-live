@@ -1,15 +1,44 @@
 import React, { useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 
-// Using CDN imports for GSAP
+// GSAP Imports
 import gsap from "https://esm.sh/gsap";
 import { ScrollTrigger } from "https://esm.sh/gsap/ScrollTrigger";
-import { Link } from "react-router-dom";
+
+// Icons Import (Make sure react-icons is installed)
+import { FaLinkedinIn, FaInstagram, FaFacebookF } from "react-icons/fa6";
+import { FaXTwitter } from "react-icons/fa6"; // X logo for Twitter
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Footer() {
   const footerRef = useRef(null);
   const ctaRef = useRef(null);
+
+  // --- SOCIAL MEDIA LINKS CONFIGURATION ---
+  // Yahan apne asli links paste karein '#' ki jagah
+  const socialLinks = [
+    { 
+      icon: <FaLinkedinIn size={14} />, 
+      href: "https://www.linkedin.com/company/digital-success-solutions-dss/", 
+      label: "LinkedIn" 
+    },
+    { 
+      icon: <FaXTwitter size={14} />, 
+      href: "https://twitter.com/your-handle", 
+      label: "X (Twitter)" 
+    },
+    { 
+      icon: <FaInstagram size={16} />, 
+      href: "https://www.instagram.com/digitalsuccess_solutions/", 
+      label: "Instagram" 
+    },
+    { 
+      icon: <FaFacebookF size={14} />, 
+      href: "https://www.facebook.com/p/Digital-Success-Solutions-61567317789854/", 
+      label: "Facebook" 
+    },
+  ];
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -88,10 +117,9 @@ export default function Footer() {
         </div>
 
         {/* --- 2. MAIN GRID LINKS --- */}
-        {/* Mobile: 2 Columns Grid | Desktop: 12 Column Grid */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8 mb-16 md:mb-24">
            
-           {/* Column 1: Brand Info (Full width on mobile) */}
+           {/* Column 1: Brand Info */}
            <div className="col-span-1 md:col-span-4 flex flex-col gap-6">
               <div className="text-2xl font-black tracking-tighter uppercase">
                  DSS<span className="text-[#0078f0]">.</span>
@@ -100,7 +128,6 @@ export default function Footer() {
                  DSS Digital Success Solutions LLP. We are a digital innovation agency crafting world-class experiences.
               </p>
               
-              {/* Address Section */}
               <div className="mt-2 text-gray-400 text-sm leading-relaxed">
                 <p className="font-bold text-white mb-1 uppercase tracking-wider text-xs">Headquarters</p>
                 <p>PLOT NO. 22, Scheme No 53,</p>
@@ -162,11 +189,18 @@ export default function Footer() {
                 </a>
               </div>
               
-              {/* Social Icons */}
+              {/* --- UPDATED SOCIAL ICONS --- */}
               <div className="flex gap-4">
-                 {['Li', 'Tw', 'In', 'Fb'].map((social, i) => (
-                    <a key={i} href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-xs font-bold text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/30 transition-all">
-                       {social}
+                 {socialLinks.map((social, i) => (
+                    <a 
+                        key={i} 
+                        href={social.href}
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        aria-label={social.label}
+                        className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-[#0078f0] hover:border-[#0078f0] transition-all duration-300"
+                    >
+                       {social.icon}
                     </a>
                  ))}
               </div>

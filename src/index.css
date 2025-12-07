@@ -146,3 +146,11 @@
   }
 }
 /* Mouse follow magic - ye JS se control hoga */
+
+
+
+  html, body, #root {
+    background: #050505;
+    margin: 0;
+    padding: 0;
+  }
