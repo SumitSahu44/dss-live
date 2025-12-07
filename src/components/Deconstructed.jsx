@@ -106,7 +106,7 @@ export default function ServicesSection() {
     loadGsap();
   }, []);
 
-  // --- ANIMATION LOGIC ---
+  // --- ANIMATION LOGIC (UPDATED FOR SNAP) ---
   useEffect(() => {
     if (!isGsapReady || !containerRef.current) return;
 
@@ -120,16 +120,12 @@ export default function ServicesSection() {
 
     const ctx = gsap.context(() => {
       
-      // 1. INITIAL SETUP (CLEANER & LESS BLUR)
+      // 1. INITIAL SETUP
       cards.forEach((card, i) => {
         gsap.set(card, { 
           zIndex: totalCards - i, 
-          // Subtle scaling for professional stack look
           scale: i === 0 ? 1 : 1 - (i * 0.05), 
-          y: i === 0 ? 0 : 30 * i, // Increased spacing slightly for better visibility
-          
-          // SIGNIFICANTLY REDUCED BLUR
-          // Old: i * 6px (Too blurry) -> New: i * 2px (Subtle depth)
+          y: i === 0 ? 0 : 30 * i, 
           filter: i === 0 ? 'blur(0px) brightness(1)' : `blur(${i * 2}px) brightness(${1 - (i * 0.15)})`, 
           opacity: 1,
           transformOrigin: "center bottom"
@@ -139,15 +135,25 @@ export default function ServicesSection() {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
-  start: "top top",
-  end: `+=${totalCards * 120}%`,
-  pin: true,
-  scrub: 0.8,          // ✅ less lag
-  anticipatePin: 1,
-  fastScrollEnd: true,
-  preventOverlaps: true,
-  invalidateOnRefresh: true,
-          // Removed 'snap' as requested for manual control
+          start: "top top",
+          // UPDATED: Reduced height multiplier (from 120% to 100%) for faster scrolling
+          end: `+=${totalCards * 100}%`, 
+          pin: true,
+          scrub: 0.5, // UPDATED: Reduced scrub for snappier feel
+          anticipatePin: 1,
+          fastScrollEnd: true,
+          preventOverlaps: true,
+          invalidateOnRefresh: true,
+          
+          // --- NEW: SNAP LOGIC ---
+          // Ye property card ko beech me atakne nahi degi.
+          snap: {
+            snapTo: 1 / (totalCards - 1), // Calculates exact points for each card
+            duration: { min: 0.2, max: 0.4 }, // Snap speed
+            delay: 0, // Wait time before snapping (0 = instant)
+            ease: "power2.inOut", // Smooth snap easing
+            inertia: false // Forces strict snapping
+          },
 
           onUpdate: (self) => {
              const progress = self.progress;
@@ -161,7 +167,7 @@ export default function ServicesSection() {
         }
       });
 
-      // 2. PROFESSIONAL SLIDE ANIMATION
+      // 2. ANIMATION
       cards.forEach((card, i) => {
           if (i === totalCards - 1) return;
 
@@ -169,13 +175,12 @@ export default function ServicesSection() {
           
           // Animate Current Card OUT
           tl.to(card, {
-              y: -window.innerHeight * 1.1, // Slide completely out
-              scale: 0.95, // Slight shrink while moving up
+              y: -window.innerHeight * 1.2, // Move further up to clear screen completely
+              scale: 0.9,
               opacity: 0,
-              // Removed rotationX for a cleaner, modern flat look
-              filter: 'blur(5px) brightness(0.8)', // Subtle motion blur
+              filter: 'blur(10px) brightness(0.5)',
               duration: 1,
-              ease: "power1.inOut" // Smooth start and end easing
+              ease: "power2.inOut" // Changed ease for sharper movement
           }, i);
 
           // Animate Next Card IN
@@ -186,19 +191,19 @@ export default function ServicesSection() {
                   filter: 'blur(0px) brightness(1)',
                   opacity: 1,
                   duration: 1,
-                  ease: "power1.inOut"
+                  ease: "power2.inOut"
               }, i);
           }
           
-          // Animate the card BEHIND (The stack movement)
+          // Animate the card BEHIND
           const futureCard = cards[i+2];
           if (futureCard) {
             tl.to(futureCard, {
-                scale: 1 - (1 * 0.05), // Move to position 2
+                scale: 1 - (1 * 0.05),
                 y: 30,
                 filter: 'blur(2px) brightness(0.85)',
                 duration: 1,
-                ease: "power1.inOut"
+                ease: "power2.inOut"
             }, i);
           }
       });
@@ -212,7 +217,7 @@ export default function ServicesSection() {
   const handleMouseMove = (e) => {
     if (!stackWrapperRef.current || !window.gsap) return;
     const { innerWidth, innerHeight } = window;
-    const x = (e.clientX / innerWidth - 0.5) * 5; // Reduced multiplier for subtler effect
+    const x = (e.clientX / innerWidth - 0.5) * 5; 
     const y = (e.clientY / innerHeight - 0.5) * 5; 
 
     window.gsap.to(stackWrapperRef.current, {
@@ -224,8 +229,8 @@ export default function ServicesSection() {
   };
 
   const handleMouseLeave = () => {
-     if (!stackWrapperRef.current || !window.gsap) return;
-     window.gsap.to(stackWrapperRef.current, { rotationY: 0, rotationX: 0, duration: 1.5 });
+      if (!stackWrapperRef.current || !window.gsap) return;
+      window.gsap.to(stackWrapperRef.current, { rotationY: 0, rotationX: 0, duration: 1.5 });
   };
 
   const currentService = services[activeCard - 1] || services[0];
@@ -371,7 +376,7 @@ export default function ServicesSection() {
 
                     {/* Card Internal Decor */}
                     <div className={`absolute -right-10 -top-10 w-64 h-64 rounded-full opacity-20 blur-3xl`} 
-                         style={{ background: service.bgAccent }} />
+                          style={{ background: service.bgAccent }} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
                     </div>
                 );
@@ -393,10 +398,10 @@ export default function ServicesSection() {
                       className={`group flex items-center gap-6 transition-all duration-500 ease-out ${isActive ? 'translate-x-4' : 'hover:translate-x-1'}`}
                    >
                       <div className={`relative z-10 w-4 h-4 rounded-full border-2 transition-all duration-300 ${isActive ? `bg-[#050505] border-${s.accent.split('-')[1]}-500 scale-125` : 'bg-[#050505] border-white/20 group-hover:border-white/50'}`}>
-                         {isActive && <div className={`absolute inset-0 m-auto w-1.5 h-1.5 rounded-full`} style={{ backgroundColor: s.bgAccent }} />}
+                          {isActive && <div className={`absolute inset-0 m-auto w-1.5 h-1.5 rounded-full`} style={{ backgroundColor: s.bgAccent }} />}
                       </div>
                       <span className={`text-lg font-medium transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/30 group-hover:text-white/60'}`}>
-                         {s.title}
+                          {s.title}
                       </span>
                    </div>
                  )
