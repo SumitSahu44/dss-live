@@ -36,11 +36,11 @@ const serviceData = {
   techStack: ["React.js", "Next.js", "Tailwind CSS", "GSAP", "Node.js", "MongoDB", "Three.js"],
 };
 
-const ServiceDetail = () => {
+const Webdev = () => {
   const containerRef = useRef(null);
   const [isGsapReady, setIsGsapReady] = useState(false);
 
-  // --- 1. SAFE GSAP LOADING (Reused from your code) ---
+  // --- 1. SAFE GSAP LOADING ---
   useEffect(() => {
     const loadGsap = async () => {
       try {
@@ -74,7 +74,7 @@ const ServiceDetail = () => {
 
     const ctx = gsap.context(() => {
       
-      // Title Parallax
+      // Title Parallax & Button Reveal
       gsap.fromTo(".svc-title-char", 
         { y: 100, opacity: 0 },
         { y: 0, opacity: 1, stagger: 0.05, duration: 1, ease: "power4.out" }
@@ -130,7 +130,7 @@ const ServiceDetail = () => {
   return (
     <div ref={containerRef} className="relative min-h-screen bg-[#020205] text-white overflow-hidden pt-24 pb-20">
       
-      {/* --- BACKGROUND (Matches Hero) --- */}
+      {/* --- BACKGROUND --- */}
       <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0a192f] via-[#050505] to-black z-0 pointer-events-none" />
       <div 
         className="fixed inset-0 opacity-20 pointer-events-none z-0 mix-blend-overlay"
@@ -157,6 +157,19 @@ const ServiceDetail = () => {
             <p className="text-zinc-400 text-lg md:text-xl max-w-2xl leading-relaxed border-l-2 border-zinc-800 pl-6 svc-title-char opacity-0 translate-y-4">
                 {serviceData.description}
             </p>
+
+            {/* --- NEW CTA BUTTON --- */}
+            <div className="mt-8 pl-6 svc-title-char opacity-0 translate-y-4">
+                <Link to="/LetsConnect">
+                    <button className="group relative px-8 py-4 bg-white text-black font-bold text-sm uppercase tracking-widest rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_-5px_rgba(0,120,240,0.5)]">
+                        <div className="absolute inset-0 bg-[#0078f0] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                        <span className="relative z-10 group-hover:text-white flex items-center gap-2">
+                            Start Your Project
+                            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </span>
+                    </button>
+                </Link>
+            </div>
         </div>
 
         {/* --- FEATURES GRID --- */}
@@ -182,17 +195,16 @@ const ServiceDetail = () => {
                 <h2 className="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-700 mb-6">How We <br/>Work</h2>
                 <p className="text-zinc-400 text-lg max-w-xs">A transparent, agile workflow designed to deliver excellence at every step.</p>
                 <div className="mt-12">
-                   <HashLink smooth to="/#contact">
+                   <Link to="/Lets-connect">
                         <button className="px-8 py-3 rounded-full border border-white/20 text-sm hover:bg-white hover:text-black transition-all duration-300 uppercase tracking-widest font-bold">
-                            Start Project
+                            Get Quote
                         </button>
-                    </HashLink>
+                    </Link>
                 </div>
             </div>
 
             {/* Steps List */}
             <div className="relative pl-8 border-l border-zinc-800">
-                {/* Animated Line Overlay */}
                 <div className="process-line absolute left-[-1px] top-0 w-[2px] bg-blue-500 shadow-[0_0_15px_#3b82f6]"></div>
 
                 <div className="flex flex-col gap-12 lg:gap-24">
@@ -209,7 +221,7 @@ const ServiceDetail = () => {
             </div>
         </div>
 
-        {/* --- TECH STACK MARQUEE / TAGS --- */}
+        {/* --- TECH STACK --- */}
         <div className="mb-32">
             <h3 className="text-center text-sm uppercase tracking-widest text-zinc-500 mb-8">Technologies We Master</h3>
             <div className="flex flex-wrap justify-center gap-3 md:gap-4">
@@ -221,11 +233,10 @@ const ServiceDetail = () => {
             </div>
         </div>
 
-     
-
+      
       </div>
     </div>
   );
 };
 
-export default WebsiteDevelopment;
+export default Webdev;

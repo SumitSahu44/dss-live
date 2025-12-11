@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useLocation } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -53,7 +54,17 @@ const processSteps = [
 export default function WorkingProcess() {
   const containerRef = useRef(null);
   const lineRef = useRef(null);
-  
+  const { hash } = useLocation(); // 2. LOCATION HOOK TO GET HASH
+   useEffect(() => {
+    if (hash === "#faq") {
+      const section = document.getElementById("faq");
+      if (section) {
+        setTimeout(() => {
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 100);
+      }
+    }
+  }, [hash]);
   useEffect(() => {
     const container = containerRef.current;
     

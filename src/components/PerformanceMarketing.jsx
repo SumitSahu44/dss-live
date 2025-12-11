@@ -158,6 +158,19 @@ const PerformanceMarketing = () => {
             <p className="text-zinc-400 text-lg md:text-xl max-w-2xl leading-relaxed border-l-2 border-zinc-800 pl-6 svc-title-char opacity-0 translate-y-4">
                 {serviceData.description}
             </p>
+
+             {/* --- NEW CTA BUTTON --- */}
+                        <div className="mt-8 pl-6 svc-title-char opacity-0 translate-y-4">
+                            <Link to="/LetsConnect">
+                                <button className="group relative px-8 py-4 bg-white text-black font-bold text-sm uppercase tracking-widest rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_-5px_rgba(0,120,240,0.5)]">
+                                    <div className="absolute inset-0 bg-[#0078f0] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                                    <span className="relative z-10 group-hover:text-white flex items-center gap-2">
+                                        Start Your Project
+                                        <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                                    </span>
+                                </button>
+                            </Link>
+                        </div>
         </div>
 
         {/* --- FEATURES GRID --- */}
