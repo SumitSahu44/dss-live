@@ -15,7 +15,7 @@ import PerformanceMarketing from "./components/PerformanceMarketing.jsx";
 import SocialMediaMarketing from "./components/SocialMediaMarketing.jsx";
 import SearchEngineOptimization from "./components/SeoOptimization.jsx";
 import InfluencerMarketing from "./components/InfluencerMarketing.jsx";
-import ECommerceApplications from "./components/ECommerceApplications.jsx"; 
+import ECommerceApplications from "./components/EcommerceApplications.jsx"; 
 import Webdev from "./components/Webdev.jsx";
 import LetsConnect from "./components/LetsConnect.jsx";
 // Lazy Loaded Pages (Inke liye Suspense zaroori hai)
