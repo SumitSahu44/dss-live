@@ -54,7 +54,17 @@ const services = [
     img: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&q=80&w=800"
   }
 ];
-
+// Scroll logic for #faq link
+  useEffect(() => {
+    if (hash === "#services") {
+      const section = document.getElementById("services");
+      if (section) {
+        setTimeout(() => {
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 50);
+      }
+    }
+  }, [hash]);
 export default function ServicesStack() {
   const containerRef = useRef(null);
   const cardsRef = useRef([]);

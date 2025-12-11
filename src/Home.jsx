@@ -1,5 +1,6 @@
 import React, { Suspense, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useHashScroll } from "./hooks/useHashScroll.js";
 
 import PremiumHero from "./components/PremiumHero.jsx";
 import TestimonialSection from "./components/Testimonials.jsx";
@@ -23,27 +24,36 @@ const Loader = () => (
 const Home = () => {
   const location = useLocation();
   const [isReady, setIsReady] = useState(false);
+  const [shouldScroll, setShouldScroll] = useState(false);
 
   /* ✅ Wait till DOM fully ready */
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsReady(true);
+      // Trigger scroll check after component is ready
+      if (location.hash) {
+        setShouldScroll(true);
+      }
     }, 100);
 
     return () => clearTimeout(timer);
   }, []);
 
-  /* ✅ Perfect hash scroll */
+  /* ✅ Reset scroll trigger when hash changes */
   useEffect(() => {
     if (location.hash && isReady) {
-      const el = document.querySelector(location.hash);
-      if (el) {
-        setTimeout(() => {
-          el.scrollIntoView({ behavior: "smooth" });
-        }, 200);
-      }
+      setShouldScroll(true);
     }
-  }, [location, isReady]);
+  }, [location.hash, isReady]);
+
+  /* ✅ Perfect hash scroll - handles navigation from other pages using custom hook */
+  useHashScroll(location.hash, {
+    enabled: isReady && !!location.hash && shouldScroll,
+    offset: 100, // Navbar offset
+    maxAttempts: 30, // More attempts for lazy components
+    initialDelay: 500, // Wait for Suspense to start loading
+    retryDelay: 300 // Retry delay for lazy components
+  });
 
   /* ✅ Stop white flash while lazy components load */
   if (!isReady) {

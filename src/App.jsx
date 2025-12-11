@@ -1,33 +1,44 @@
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
+// --- COMPONENTS ---
 import CustomCursor from "./components/CustomCursor.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Preloader from "./components/Preloader.jsx";
 import CreativeFooter from "./components/CreativeFooter.jsx";
 import Home from "./Home.jsx";
+import AboutPage from "./components/AboutPage.jsx";
+// --- PAGES ---
+// import WebDevelopment from "./components/WebDevelopment.jsx";
+import PerformanceMarketing from "./components/PerformanceMarketing.jsx";
+import SocialMediaMarketing from "./components/SocialMediaMarketing.jsx";
+import SearchEngineOptimization from "./components/SeoOptimization.jsx";
+import InfluencerMarketing from "./components/InfluencerMarketing.jsx";
+import ECommerceApplications from "./components/ECommerceApplications.jsx"; 
 
+
+
+// Lazy Loaded Pages (Inke liye Suspense zaroori hai)
 const PrivacyPolicy = React.lazy(() => import("./components/PrivacyPolicy.jsx"));
-const TermsAndConditions = React.lazy(() =>
-  import("./components/TermsAndConditions.jsx")
-);
+const TermsAndConditions = React.lazy(() => import("./components/TermsAndConditions.jsx"));
 
-// ✅ GLOBAL HASH SCROLL FIX
-function ScrollToHash() {
-  const { hash, pathname } = useLocation();
+// ✅ ULTIMATE SCROLL HANDLER (Top + Hash)
+function ScrollController() {
+  const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    if (!hash) return;
-
-    const timeout = setTimeout(() => {
-      const el = document.querySelector(hash);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 600); // wait for lazy components
-
-    return () => clearTimeout(timeout);
-  }, [hash, pathname]);
+    // Agar URL me #hash hai (Jaise /#contact)
+    if (hash && pathname === "/") {
+      // Hash scrolling is now handled by Home component's useHashScroll hook
+      // This prevents conflicts
+      return;
+    }
+    
+    // Agar normal page change hai (Jaise Home -> Services) aur hash nahi hai
+    if (!hash) {
+      window.scrollTo(0, 0); // PAGE KO TOP PE FEK DO
+    }
+  }, [pathname, hash]);
 
   return null;
 }
@@ -35,17 +46,33 @@ function ScrollToHash() {
 const App = () => {
   return (
     <BrowserRouter>
-      <ScrollToHash /> {/* ✅ this fixes everything */}
+      {/* 1. Scroll Logic sabse upar */}
+      <ScrollController />
 
+      {/* 2. Global Components */}
       <Preloader />
       <CustomCursor />
       <Navbar />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
-      </Routes>
+      {/* 3. Routes with Suspense (Loading State) */}
+      <Suspense fallback={<div className="h-screen w-full bg-[#050505]"></div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+           <Route path="/About" element={<AboutPage />} />
+          
+          {/* Services Routes */}
+          {/* <Route path="/website-design-and-website-development" element={<WebDevelopment />} /> */}
+           <Route path="/performance-marketing-ppc" element={<PerformanceMarketing />} />
+            <Route path="/social-media-marketing" element={<SocialMediaMarketing />} />
+             <Route path="/search-engine-optimization" element={<SearchEngineOptimization />} />
+              <Route path="/influencer-marketing" element={<InfluencerMarketing />} />
+               <Route path="/e-commerce-applications" element={<ECommerceApplications />} />
+          
+          {/* Legal Pages */}
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
+        </Routes>
+      </Suspense>
 
       <CreativeFooter />
     </BrowserRouter>

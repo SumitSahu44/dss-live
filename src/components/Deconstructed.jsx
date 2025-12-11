@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Globe, Megaphone, Share2, Search, PenTool, ShoppingBag, MapPin, ArrowRight, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom'; // 1. IMPORT ADDED
 
+// 2. DATA ME LINK ADD KIYA HAI
 const services = [
   {
     id: "01",
@@ -10,6 +12,7 @@ const services = [
     theme: "from-blue-900 via-blue-950 to-black",
     accent: "text-blue-400",
     bgAccent: "rgba(59, 130, 246, 0.4)",
+    link: "/website-design-and-website-development", // <--- LINK ADDED
     features: ["Static & Dynamic Websites", "WordPress, Shopify, MERN", "SSL, Hosting, Speed Opt", "Admin Panel Development", "E-commerce Store Setup", "Fully Responsive + SEO"]
   },
   {
@@ -20,6 +23,7 @@ const services = [
     theme: "from-orange-900 via-orange-950 to-black",
     accent: "text-orange-400",
     bgAccent: "rgba(249, 115, 22, 0.4)",
+    link: "/performance-marketing-ppc", // <--- LINK ADDED
     features: ["Facebook & Instagram Ads", "Google Ads (Search, Display)", "Lead Generation", "Sales Funnels", "Audience Targeting", "Retargeting & Scaling"]
   },
   {
@@ -30,6 +34,7 @@ const services = [
     theme: "from-pink-900 via-pink-950 to-black",
     accent: "text-pink-400",
     bgAccent: "rgba(236, 72, 153, 0.4)",
+    link: "/social-media-marketing", // <--- LINK ADDED
     features: ["12–15 Posts per month", "Reels & Motion Graphics", "Creative Storytelling", "Brand Consistency", "Page Optimization", "Monthly Analytics Report"]
   },
   {
@@ -40,16 +45,18 @@ const services = [
     theme: "from-green-900 via-green-950 to-black",
     accent: "text-green-400",
     bgAccent: "rgba(34, 197, 94, 0.4)",
+    link: "/search-engine-optimization", // <--- LINK ADDED
     features: ["Keyword Research", "On-Page Optimization", "Technical SEO", "Backlink Building", "Local SEO", "Ranking Reports"]
   },
   {
     id: "05",
-    title: "Branding & Design",
+    title: "Influencer Marketing",
     desc: "Professional branding and design solutions crafted to define your brand’s identity. We create designs that truly represent you.",
     icon: PenTool,
     theme: "from-purple-900 via-purple-950 to-black",
     accent: "text-purple-400",
     bgAccent: "rgba(168, 85, 247, 0.4)",
+    link: "/influencer-marketing", // <--- LINK ADDED
     features: ["Logo Design", "Packaging Design", "Catalogues", "Visiting Cards", "Brochures & Flyers", "Social Media Creative Kit"]
   },
   {
@@ -60,18 +67,10 @@ const services = [
     theme: "from-yellow-900 via-yellow-950 to-black",
     accent: "text-yellow-400",
     bgAccent: "rgba(234, 179, 8, 0.4)",
+    link: "/e-commerce-applications", // <--- LINK ADDED
     features: ["Shopify Store Setup", "Payment Gateway Integration", "Delivery Partner Setup", "Product Listing", "Conversion Optimization"]
   },
-  {
-    id: "07",
-    title: "Local Business Growth",
-    desc: "Professional strategies designed to boost your local business presence. We create tailored plans that help your business attract more local customers.",
-    icon: MapPin,
-    theme: "from-red-900 via-red-950 to-black",
-    accent: "text-red-400",
-    bgAccent: "rgba(239, 68, 68, 0.4)",
-    features: ["GMB Profile Setup", "Local SEO", "Review Management", "Local Ads", "Reputation Building"]
-  }
+  
 ];
 
 export default function ServicesSection() {
@@ -81,6 +80,8 @@ export default function ServicesSection() {
   const [activeCard, setActiveCard] = useState(1);
   const activeCardRef = useRef(1);
   const [isGsapReady, setIsGsapReady] = useState(false);
+  
+  const navigate = useNavigate(); // 3. HOOK INITIALIZATION
 
   // --- SAFE GSAP LOADING ---
   useEffect(() => {
@@ -106,7 +107,7 @@ export default function ServicesSection() {
     loadGsap();
   }, []);
 
-  // --- ANIMATION LOGIC (UPDATED FOR SNAP) ---
+  // --- ANIMATION LOGIC ---
   useEffect(() => {
     if (!isGsapReady || !containerRef.current) return;
 
@@ -136,25 +137,20 @@ export default function ServicesSection() {
         scrollTrigger: {
           trigger: container,
           start: "top top",
-          // UPDATED: Reduced height multiplier (from 120% to 100%) for faster scrolling
           end: `+=${totalCards * 100}%`, 
           pin: true,
-          scrub: 0.5, // UPDATED: Reduced scrub for snappier feel
+          scrub: 0.5,
           anticipatePin: 1,
           fastScrollEnd: true,
           preventOverlaps: true,
           invalidateOnRefresh: true,
-          
-          // --- NEW: SNAP LOGIC ---
-          // Ye property card ko beech me atakne nahi degi.
           snap: {
-            snapTo: 1 / (totalCards - 1), // Calculates exact points for each card
-            duration: { min: 0.2, max: 0.4 }, // Snap speed
-            delay: 0, // Wait time before snapping (0 = instant)
-            ease: "power2.inOut", // Smooth snap easing
-            inertia: false // Forces strict snapping
+            snapTo: 1 / (totalCards - 1),
+            duration: { min: 0.2, max: 0.4 },
+            delay: 0,
+            ease: "power2.inOut",
+            inertia: false
           },
-
           onUpdate: (self) => {
              const progress = self.progress;
              const rawIndex = Math.round(progress * (totalCards - 1));
@@ -167,23 +163,20 @@ export default function ServicesSection() {
         }
       });
 
-      // 2. ANIMATION
+      // 2. ANIMATION LOOP
       cards.forEach((card, i) => {
           if (i === totalCards - 1) return;
-
           const nextCard = cards[i+1];
           
-          // Animate Current Card OUT
           tl.to(card, {
-              y: -window.innerHeight * 1.2, // Move further up to clear screen completely
+              y: -window.innerHeight * 1.2,
               scale: 0.9,
               opacity: 0,
               filter: 'blur(10px) brightness(0.5)',
               duration: 1,
-              ease: "power2.inOut" // Changed ease for sharper movement
+              ease: "power2.inOut"
           }, i);
 
-          // Animate Next Card IN
           if (nextCard) {
               tl.to(nextCard, {
                   y: 0,
@@ -195,7 +188,6 @@ export default function ServicesSection() {
               }, i);
           }
           
-          // Animate the card BEHIND
           const futureCard = cards[i+2];
           if (futureCard) {
             tl.to(futureCard, {
@@ -235,6 +227,11 @@ export default function ServicesSection() {
 
   const currentService = services[activeCard - 1] || services[0];
 
+  // Helper for clicking side navigation
+  const handleNavClick = (link) => {
+      navigate(link);
+  }
+
   return (
     <section 
       ref={containerRef}
@@ -256,7 +253,7 @@ export default function ServicesSection() {
                 mixBlendMode: 'screen' 
             }}
         />
-
+        {/* ... (rest of background divs same as before) ... */}
         <div 
             className="absolute top-[60%] left-[40%] -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] transition-all duration-1000 ease-linear opacity-10"
             style={{
@@ -274,9 +271,9 @@ export default function ServicesSection() {
 
       {/* --- CONTENT --- */}
      <div className="relative z-10 w-full max-w-[1600px] h-full 
-     flex flex-col items-center justify-start 
-     md:flex-row md:justify-between 
-     px-4 sm:px-6 md:px-12 py-10">  
+      flex flex-col items-center justify-start 
+      md:flex-row md:justify-between 
+      px-4 sm:px-6 md:px-12 py-10">  
         
         {/* LEFT COLUMN */}
         <div className="hidden md:flex flex-1 flex-col justify-center h-full pr-10">
@@ -310,7 +307,7 @@ export default function ServicesSection() {
           
           <div className="md:hidden text-center mb-8">
              <h2 className="text-3xl font-bold text-white mb-2">Our Services</h2>
-             <div className="text-white/40 text-sm">Swipe or Scroll to explore</div>
+             <div className="text-white/40 text-sm">Tap card to explore</div>
           </div>
 
           <div 
@@ -325,14 +322,16 @@ export default function ServicesSection() {
                     <div
                     key={index}
                     ref={el => cardsRef.current[index] = el}
-                    className={`absolute inset-0 rounded-[2rem] p-6 md:p-8 flex flex-col border border-white/10 shadow-2xl overflow-hidden bg-gradient-to-br ${service.theme} will-change-transform`}
+                    // --- 4. CLICK HANDLER ADDED HERE ---
+                    onClick={() => navigate(service.link)}
+                    className={`absolute inset-0 rounded-[2rem] p-6 md:p-8 flex flex-col border border-white/10 shadow-2xl overflow-hidden bg-gradient-to-br ${service.theme} will-change-transform cursor-pointer hover:border-white/30 transition-colors`}
                     style={{ 
                         boxShadow: '0 0 0 1px rgba(255,255,255,0.05), 0 20px 50px -10px rgba(0,0,0,0.5)',
                     }}
                     >
                     
                     {/* Inner content wrapper */}
-                    <div className="relative z-20 flex flex-col h-full">
+                    <div className="relative z-20 flex flex-col h-full pointer-events-none"> {/* Added pointer-events-none to children so parent div catches click reliably */}
                         <div className="flex justify-between items-start w-full shrink-0">
                             <span className={`text-5xl md:text-7xl font-black opacity-20 tracking-tighter select-none ${service.accent}`}>
                             {service.id}
@@ -367,7 +366,7 @@ export default function ServicesSection() {
                             {service.desc}
                             </p>
 
-                            <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest cursor-pointer group ${service.accent}`}>
+                            <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest group ${service.accent}`}>
                             <span>Explore Details</span>
                             <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                             </div>
@@ -395,7 +394,8 @@ export default function ServicesSection() {
                  return (
                    <div 
                       key={idx} 
-                      className={`group flex items-center gap-6 transition-all duration-500 ease-out ${isActive ? 'translate-x-4' : 'hover:translate-x-1'}`}
+                      onClick={() => handleNavClick(s.link)} // Added click to side nav too
+                      className={`group flex items-center gap-6 transition-all duration-500 ease-out cursor-pointer ${isActive ? 'translate-x-4' : 'hover:translate-x-1'}`}
                    >
                       <div className={`relative z-10 w-4 h-4 rounded-full border-2 transition-all duration-300 ${isActive ? `bg-[#050505] border-${s.accent.split('-')[1]}-500 scale-125` : 'bg-[#050505] border-white/20 group-hover:border-white/50'}`}>
                           {isActive && <div className={`absolute inset-0 m-auto w-1.5 h-1.5 rounded-full`} style={{ backgroundColor: s.bgAccent }} />}

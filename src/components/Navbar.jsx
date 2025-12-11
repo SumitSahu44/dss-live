@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import gsap from "https://esm.sh/gsap";
+import { gsap } from "gsap";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const [isVisible, setIsVisible] = useState(true);
@@ -49,31 +50,46 @@ export default function Navbar() {
     }
   }, [isMobileMenuOpen]);
 
-  // ✅ UNIVERSAL NAVIGATION FIX
+  // ✅ UNIVERSAL NAVIGATION FIX - Works from any page
   const goToSection = (hash) => {
     setIsMobileMenuOpen(false);
 
-    // Always navigate to home with hash
+    // If not on home page → navigate to home with hash
     if (location.pathname !== "/") {
-      navigate("/" + hash);
+      // Navigate to home page with hash in URL
+      // Use React Router's navigate with hash option for proper handling
+      const hashValue = hash.startsWith('#') ? hash.substring(1) : hash;
+      navigate({ pathname: "/", hash: hashValue }, { replace: false });
       return;
     }
 
-    // If already on home → smooth scroll
-    requestAnimationFrame(() => {
+    // Already on home page → update URL and scroll
+    // The Home component's useHashScroll hook will handle the actual scrolling
+    window.history.pushState(null, "", hash);
+    
+    // Trigger scroll immediately if element exists, otherwise Home's hook will handle it
+    const scrollToElement = (attempt = 0) => {
       const el = document.querySelector(hash);
       if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-      } else {
-        // fallback retry for lazy loaded sections
-        setTimeout(() => {
-          const retryEl = document.querySelector(hash);
-          if (retryEl) {
-            retryEl.scrollIntoView({ behavior: "smooth" });
-          }
-        }, 300);
+        const rect = el.getBoundingClientRect();
+        const isRendered = rect.height > 0 || el.offsetHeight > 0;
+        
+        if (isRendered) {
+          const offsetTop = el.offsetTop - 100;
+          window.scrollTo({
+            top: Math.max(0, offsetTop),
+            behavior: "smooth"
+          });
+        } else if (attempt < 5) {
+          // Quick retry for immediate scroll if already on page
+          setTimeout(() => scrollToElement(attempt + 1), 200);
+        }
+      } else if (attempt < 5) {
+        setTimeout(() => scrollToElement(attempt + 1), 200);
       }
-    });
+    };
+    
+    scrollToElement();
   };
 
   const navLinks = ["work", "services", "portfolio", "about"];
@@ -101,7 +117,7 @@ export default function Navbar() {
 
           {/* DESKTOP LINKS */}
           <div className="hidden md:flex items-center gap-1 bg-white/5 rounded-full px-2 py-1.5 border border-white/5 ml-4">
-            {navLinks.map((name) => (
+            {/* {navLinks.map((name) => (
               <button
                 key={name}
                 onClick={() => goToSection(`#${name}`)}
@@ -109,7 +125,16 @@ export default function Navbar() {
               >
                 {name.charAt(0).toUpperCase() + name.slice(1)}
               </button>
-            ))}
+            ))} */}
+            <Link to={"/#services"} className="px-5 py-1.5 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all duration-300">
+              Services
+            </Link>
+            <Link to={"/#portfolio"} className="px-5 py-1.5 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all duration-300">
+              Portfolio
+            </Link>
+            <Link to={"/#about"} className="px-5 py-1.5 text-xs font-medium text-gray-400 hover:text-white hover:bg-white/10 rounded-full transition-all duration-300">
+              About
+            </Link>
           </div>
 
           {/* CTA + HAMBURGER */}

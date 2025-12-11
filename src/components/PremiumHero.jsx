@@ -1,9 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import { HashLink } from "react-router-hash-link";
 
 const HeroSection = () => {
- 
   const sectionRef = useRef(null);
   const imageContainerRef = useRef(null);
   const statsRef = useRef([]);
@@ -33,25 +31,19 @@ const HeroSection = () => {
     loadGsap();
   }, []);
 
-  // --- 2. COORDINATES (Tighter & Inside Image Area) ---
+  // --- 2. COORDINATES ---
   const stats = useMemo(() => {
-    // Coordinates ko image ke center ke pass rakha hai (Max X: 340, Max Y: 150)
-    // Isse wo image box se bahar nahi jayenge.
     return [
-        { number: "950+", label: "Happy Clients", x: -280, y: -190 }, // Top Left
-        { number: "5+", label: "Years Exp.", x: 280, y: -200 },       // Top Right
-        
-        { number: "1600+", label: "Projects", x: -340, y: -40 },        // Mid Left (Wider)
-        { number: "40+", label: "Industry", x: 340, y: -50 },            // Mid Right (Wider)
-        
-        { number: "₹10Cr+", label: "Revenue", x: -220, y: 100 },       // Bottom Left (Closer)
-        { number: "4.9", label: "Rating", x: 220, y: 100 },           // Bottom Right (Closer)
+        { number: "950+", label: "Happy Clients", x: -280, y: -190 }, 
+        { number: "5+", label: "Years Exp.", x: 280, y: -200 },       
+        { number: "1600+", label: "Projects", x: -340, y: -40 },        
+        { number: "40+", label: "Industry", x: 340, y: -50 },            
+        { number: "₹10Cr+", label: "Revenue", x: -220, y: 100 },       
+        { number: "4.9", label: "Rating", x: 220, y: 100 },           
     ];
   }, []);
 
-  // --- 3. ANIMATION LOGIC ---
-// --- 3. ANIMATION LOGIC (UPDATED & FIXED) ---
- // --- 3. ANIMATION LOGIC (FIXED) ---
+  // --- 3. ANIMATION LOGIC (FIXED: STATIC POSITIONS) ---
   useEffect(() => {
     if (!isGsapReady || !sectionRef.current) return;
 
@@ -63,14 +55,24 @@ const HeroSection = () => {
 
     let ctx = gsap.context(() => {
       
-      // 1. Initial State: Center me chupao
-      gsap.set(statsEls, {
-        x: 0, y: 0, scale: 0, opacity: 0,
-        xPercent: -50, yPercent: -50,
-        position: "absolute", left: "50%", top: "50%",
+      // 1. SETUP: Cards ko seedha unki jagah pe rakh do (No Center Positioning)
+      statsEls.forEach((el, i) => {
+         if(!el || !stats[i]) return;
+         
+         gsap.set(el, {
+            x: stats[i].x, // Seedha apni coordinates pe
+            y: stats[i].y, 
+            left: "50%",   // Reference center se
+            top: "50%",    
+            xPercent: -50, 
+            yPercent: -50,
+            scale: 0.8,    // Thoda chota start hoga
+            opacity: 0,    // Chupa hua
+            position: "absolute"
+         });
       });
 
-      // 2. EXPLOSION ANIMATION
+      // 2. REVEAL ANIMATION (Wahi ke wahi Pop-up honge)
       const statsTl = gsap.timeline({
         scrollTrigger: {
           trigger: imageContainerRef.current,
@@ -79,34 +81,29 @@ const HeroSection = () => {
       });
 
       statsTl.to(statsEls, {
-        // --- YE HAI MAIN FIX ---
-        // Hum dataset (HTML) use nahi kar rahe, seedha 'stats' array use kar rahe hain
-        x: (i) => stats[i]?.x || 0,  
-        y: (i) => stats[i]?.y || 0,
-        // ----------------------
         scale: 1,
         opacity: 1,
-        duration: 1.4,
-        stagger: 0.08,
-        ease: "elastic.out(1, 0.6)",
-        force3D: true,
+        duration: 0.6,
+        stagger: 0.1, // Ek ke baad ek aayenge
+        ease: "back.out(1.2)", // Thoda sa bounce effect
       });
 
-      // 3. FLOAT ANIMATION
+      // 3. FLOATING LOOP (Sirf Y-axis movement)
       statsEls.forEach((stat, i) => {
+        // Random delay taaki sab ek robot ki tarah na hilein
+        const randomDelay = Math.random() * 2;
+        
         gsap.to(stat, {
-          y: `+=${10 + Math.random() * 5}`, 
-          x: `+=${5 + Math.random() * 5}`, 
-          rotation: Math.random() * 4 - 2, // Thoda sa rotation natural feel ke liye
-          duration: 2 + Math.random(), 
+          y: `+=${15}`, // Apni jagah se 15px neeche jayega fir wapas aayega
+          duration: 2 + Math.random(), // 2 se 3 second ka smooth time
           repeat: -1,
           yoyo: true,
           ease: "sine.inOut",
-          delay: 1.4 + (i * 0.1),
+          delay: randomDelay, // Reveal hone ke baad turant start na ho
         });
       });
 
-      // 4. TEXT ANIMATIONS (Optional - aapka purana code yaha rakh sakte hain)
+      // Text Animations
       gsap.fromTo(".hero-title .char-line", 
         { y: 100, opacity: 0 }, 
         { y: 0, opacity: 1, duration: 1.2, stagger: 0.1, ease: "power3.out" }
@@ -118,11 +115,11 @@ const HeroSection = () => {
 
     }, sectionRef);
 
-    // FIX: Refresh ScrollTrigger after a small delay to ensure positions are correct
     setTimeout(() => ScrollTrigger.refresh(), 500);
 
     return () => ctx.revert();
-  }, [isGsapReady, stats]); // 'stats' dependency zaroori hai
+  }, [isGsapReady, stats]);
+
   return (
     <section
       ref={sectionRef}
@@ -171,27 +168,22 @@ const HeroSection = () => {
       </h1>
 
       <div className="hero-cta z-20 mb-24 relative opacity-0">
-    
-<HashLink smooth to="/#contact">
-  <button className="group relative px-10 py-4 bg-white text-black font-bold text-sm uppercase tracking-widest rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.4)]">
-    <div className="absolute inset-0 bg-[#0078f0] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-    <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
-      Start Your Journey
-      <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-      </svg>
-    </span>
-  </button>
-</HashLink>
-
+        <HashLink smooth to="/#contact">
+          <button className="group relative px-10 py-4 bg-white text-black font-bold text-sm uppercase tracking-widest rounded-full overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_-10px_rgba(255,255,255,0.4)]">
+            <div className="absolute inset-0 bg-[#0078f0] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+            <span className="relative z-10 flex items-center gap-2 group-hover:text-white transition-colors">
+              Start Your Journey
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </span>
+          </button>
+        </HashLink>
       </div>
 
       {/* --- IMAGE & FLOATING STATS --- */}
       <div ref={imageContainerRef} className="relative w-full max-w-6xl mx-auto z-10 pb-32">
         
-        {/* Glow behind image */}
-        {/* <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-1000"></div> */}
-
         {/* Main Image Container */}
         <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl bg-zinc-900/50 backdrop-blur-sm group will-change-transform aspect-[16/9] md:aspect-[21/9]">
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
@@ -204,13 +196,12 @@ const HeroSection = () => {
             />
         </div>
 
-        {/* Floating Stats - Glassmorphism & Tighter Positioning */}
+        {/* Floating Stats - FIXED & STATIC INITIALLY */}
         {stats.map((stat, i) => (
           <div
             key={i}
             ref={(el) => (statsRef.current[i] = el)}
-            data-final-x={stat.x}
-            data-final-y={stat.y}
+            // data attributes hata diye, zaroorat nahi hai ab
             className="hidden md:flex flex-col items-center justify-center
                        absolute z-[50] 
                        /* Glass Style */
@@ -219,8 +210,8 @@ const HeroSection = () => {
                        rounded-2xl p-4 min-w-[130px]
                        shadow-[0_8px_32px_0_rgba(0,0,0,0.36)]
                        will-change-transform cursor-default
-                       opacity-0"
-            style={{ left: "50%", top: "50%" }}
+                       opacity-0" // Initially invisible
+            style={{ left: "50%", top: "50%" }} // Base position, GSAP will move it
           >
             <div className="text-2xl font-black text-white tracking-tight drop-shadow-md">
               {stat.number}
@@ -234,7 +225,7 @@ const HeroSection = () => {
           </div>
         ))}
 
-        {/* Mobile Stats Grid (Simple Layout) */}
+        {/* Mobile Stats Grid */}
         <div className="md:hidden grid grid-cols-2 gap-3 mt-8 px-4">
           {stats.map((stat, i) => (
             <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-4 text-center backdrop-blur-md">
