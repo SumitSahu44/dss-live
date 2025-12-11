@@ -67,6 +67,7 @@ const Home = () => {
         <PremiumHero />
       </section>
 
+
       <Suspense fallback={<Loader />}>
         {/* 2️⃣ About */}
         <section id="about">
