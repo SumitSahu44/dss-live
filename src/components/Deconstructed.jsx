@@ -1,12 +1,13 @@
-import React, { useLayoutEffect, useRef, useState } from 'react'; // useLayoutEffect is key here
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Globe, Megaphone, Share2, Search, PenTool, ShoppingBag, ArrowRight, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 
-// Register Plugin outside component to avoid re-registration issues
+// Register Plugin
 gsap.registerPlugin(ScrollTrigger);
 
+// --- 1. ORIGINAL FULL DATA ---
 const services = [
   {
     id: "01",
@@ -80,87 +81,92 @@ export default function ServicesSection() {
   const containerRef = useRef(null);
   const stackWrapperRef = useRef(null);
   const cardsRef = useRef([]);
-  const [activeCard, setActiveCard] = useState(1);
-  const activeCardRef = useRef(1);
   const navigate = useNavigate();
+  
+  // State for active card
+  const [activeCard, setActiveCard] = useState(1);
+  const activeCardRef = useRef(1); 
 
-  // --- ANIMATION LOGIC (UseLayoutEffect for smoother paint) ---
+  // --- ANIMATION LOGIC (Optimized) ---
   useLayoutEffect(() => {
     const container = containerRef.current;
-    const cards = cardsRef.current.filter(Boolean);
-    const totalCards = cards.length;
+    if (!container) return;
 
-    let ctx = gsap.context(() => {
-      
-      // 1. INITIAL SETUP
-      // Pehle card ko perfectly center rakho, baaki ko thoda neeche aur chota
+    const ctx = gsap.context(() => {
+      const cards = cardsRef.current.filter(Boolean);
+      const totalCards = cards.length;
+
+      // Initial Setup
       cards.forEach((card, i) => {
         gsap.set(card, { 
           zIndex: totalCards - i, 
-          scale: i === 0 ? 1 : 1 - (i * 0.05), // Subtle scale difference
-          y: i === 0 ? 0 : 40, // Sirf 40px neeche, taaki jump na kare
+          scale: i === 0 ? 1 : 1 - (i * 0.04), 
+          yPercent: i === 0 ? 0 : 6 * i,
           filter: i === 0 ? 'blur(0px) brightness(1)' : `blur(${i * 2}px) brightness(${1 - (i * 0.15)})`, 
-          opacity: i === 0 ? 1 : 0.6, // Peeche wale thode dim
-          transformOrigin: "center bottom"
+          opacity: 1,
+          transformOrigin: "center bottom",
+          force3D: true 
         });
       });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
-          start: "top top", // Section top hit karte hi pin ho jayega
-          end: `+=${totalCards * 120}%`, // Scroll duration thoda badhaya for smoothness
+          start: "top top",
+          end: `+=${totalCards * 100}%`,
           pin: true,
-          scrub: 1, // 0.5 ki jagah 1 kiya taaki buttery smooth feel aaye
+          scrub: 1, 
           anticipatePin: 1,
+          snap: {
+            snapTo: 1 / (totalCards - 1),
+            duration: { min: 0.3, max: 0.6 },
+            delay: 0,
+            ease: "power2.inOut", 
+          },
           onUpdate: (self) => {
-             // Logic to sync sidebar active state
+             // Optimized Update to reduce re-renders
              const progress = self.progress;
              const rawIndex = Math.round(progress * (totalCards - 1));
              const safeIndex = Math.min(Math.max(rawIndex + 1, 1), totalCards);
+             
              if (activeCardRef.current !== safeIndex) {
                  activeCardRef.current = safeIndex;
-                 setActiveCard(safeIndex);
+                 setActiveCard(safeIndex); 
              }
           }
         }
       });
 
-      // 2. ANIMATION LOOP
+      // Animation Loop
       cards.forEach((card, i) => {
           if (i === totalCards - 1) return;
           const nextCard = cards[i+1];
           
-          // Current Card Exit
-          // Hum isse screen ke bahar nahi fekenge, bas fade aur scale down karenge
           tl.to(card, {
-              y: -50, // Sirf thoda sa upar jayega
-              scale: 0.85,
+              yPercent: -120, 
+              scale: 0.9,
               opacity: 0,
-              filter: 'blur(10px) brightness(0.5)',
+              filter: 'blur(8px) brightness(0.5)',
               duration: 1,
               ease: "power2.inOut"
           }, i);
 
-          // Next Card Entry
           if (nextCard) {
               tl.to(nextCard, {
-                  y: 0,
+                  yPercent: 0,
                   scale: 1,
                   filter: 'blur(0px) brightness(1)',
                   opacity: 1,
                   duration: 1,
                   ease: "power2.inOut"
-              }, i); // 'i' means ye dono animations saath me hongi
+              }, i);
           }
           
-          // Future Card Preparation (Queue me aana)
           const futureCard = cards[i+2];
           if (futureCard) {
             tl.to(futureCard, {
-                scale: 1 - (1 * 0.05),
-                y: 40,
-                opacity: 0.6,
+                scale: 1 - (1 * 0.04),
+                yPercent: 6,
                 filter: 'blur(2px) brightness(0.85)',
                 duration: 1,
                 ease: "power2.inOut"
@@ -173,18 +179,19 @@ export default function ServicesSection() {
     return () => ctx.revert();
   }, []);
 
-  // Mouse tilt effect (Optimized)
+  // Mouse Tilt
   const handleMouseMove = (e) => {
     if (!stackWrapperRef.current) return;
     const { innerWidth, innerHeight } = window;
-    const x = (e.clientX / innerWidth - 0.5) * 5; 
-    const y = (e.clientY / innerHeight - 0.5) * 5; 
+    const x = (e.clientX / innerWidth - 0.5) * 8; 
+    const y = (e.clientY / innerHeight - 0.5) * 8; 
 
     gsap.to(stackWrapperRef.current, {
       rotationY: x, 
       rotationX: -y, 
-      duration: 1,
+      duration: 1, 
       ease: "power2.out",
+      overwrite: "auto"
     });
   };
 
@@ -194,55 +201,38 @@ export default function ServicesSection() {
   };
 
   const currentService = services[activeCard - 1] || services[0];
-  const handleNavClick = (link) => navigate(link);
 
   return (
     <section 
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      id="services"
       onMouseLeave={handleMouseLeave}
-      // Fixed: h-screen ki jagah explicit styling aur padding fix
+      id="services"
       className="relative h-screen w-full bg-[#050505] overflow-hidden flex flex-col items-center justify-center font-sans"
-      style={{ isolation: 'isolate', paddingTop: '0px', paddingBottom: '40px' }} 
     >
       
-      {/* --- BACKGROUND GLOW & NOISE --- */}
-      {/* Background ko ensure karne ke liye white flash na aaye */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-[#050505]">
+      {/* --- BACKGROUND --- */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[#050505]" />
         
         <div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vw] md:w-[60vw] md:h-[60vw] transition-all duration-1000 ease-linear opacity-20"
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] transition-all duration-1000 ease-in-out opacity-20 blur-[100px]"
             style={{
                 background: `radial-gradient(circle, ${currentService.bgAccent} 0%, rgba(0,0,0,0) 70%)`,
-                mixBlendMode: 'screen' 
-            }}
-        />
-        
-        <div 
-            className="absolute top-[60%] left-[40%] -translate-x-1/2 -translate-y-1/2 w-[50vw] h-[50vw] transition-all duration-1000 ease-linear opacity-10"
-            style={{
-                background: `radial-gradient(circle, ${currentService.bgAccent} 0%, rgba(0,0,0,0) 60%)`,
-                mixBlendMode: 'plus-lighter'
+                willChange: 'background' 
             }}
         />
 
-        <div className="absolute inset-0 opacity-[0.07]" 
-             style={{ backgroundImage: 'url("https://grainy-gradients.vercel.app/noise.svg")', filter: 'contrast(120%) brightness(100%)' }} />
-        
+        <div className="absolute inset-0 opacity-[0.07] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] brightness-100 contrast-125" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px]" />
         <div className="absolute inset-0 bg-radial-gradient from-transparent via-[#050505]/50 to-[#050505]" />
       </div>
 
       {/* --- CONTENT --- */}
-      {/* Adjusted padding here */}
-     <div className="relative z-10 w-full max-w-[1600px] h-full 
-      flex flex-col items-center justify-start 
-      md:flex-row md:justify-between 
-      px-4 sm:px-6 md:px-12 pt-10 md:pt-0">  
+      <div className="relative z-10 w-full max-w-[1600px] h-full flex flex-col md:flex-row items-center justify-between px-4 sm:px-6 md:px-12 py-10">  
         
-        {/* LEFT COLUMN */}
-        <div className="hidden md:flex flex-1 flex-col justify-center h-full pr-10">
+        {/* LEFT COLUMN: Text */}
+        <div className="hidden md:flex flex-1 flex-col justify-center h-full pr-10 relative">
           <div className="mb-8">
              <div className="flex items-center gap-3 mb-4">
                  <div className="h-[2px] w-12 bg-white/30"></div>
@@ -256,30 +246,29 @@ export default function ServicesSection() {
              </h2>
           </div>
 
-          <div className="relative">
-             <span className="text-[120px] lg:text-[180px] font-black text-white/5 leading-none select-none absolute -top-10 -left-6 lg:-top-20 lg:-left-10 transition-all duration-500">
+          <div className="relative mt-8">
+             <span className="text-[120px] lg:text-[180px] font-black text-white/5 leading-none select-none absolute -top-10 -left-6 lg:-top-24 lg:-left-10 transition-all duration-700 ease-out">
                {currentService.id}
              </span>
-             <div className="relative z-10 mt-12">
-               <p className="text-gray-400 text-lg max-w-sm leading-relaxed border-l-2 border-white/10 pl-6">
-                 Scroll through our specialized services designed to elevate your brand in the digital landscape.
+             <div className="relative z-10 pl-6 border-l-2 border-white/10 backdrop-blur-sm">
+               <p className="text-gray-400 text-lg max-w-sm leading-relaxed">
+                 {currentService.desc}
                </p>
              </div>
           </div>
         </div>
 
         {/* CENTER COLUMN: CARD STACK */}
-        {/* Added some top margin on mobile to push cards down slightly */}
-        <div className="flex flex-col md:flex-shrink-0 w-full md:w-[450px] flex items-center justify-center h-full mt-4 md:mt-0">
+        <div className="flex flex-col w-full md:w-[450px] items-center justify-center h-full pt-10 md:pt-0">
           
           <div className="md:hidden text-center mb-6">
              <h2 className="text-3xl font-bold text-white mb-2">Our Services</h2>
-             <div className="text-white/40 text-sm">Tap card to explore</div>
+             <p className="text-white/40 text-xs uppercase tracking-widest">Swipe to explore</p>
           </div>
 
           <div 
             ref={stackWrapperRef}
-            className="relative w-full aspect-[3/4] md:w-[400px] md:h-[600px] lg:w-[420px] lg:h-[620px]"
+            className="relative w-full aspect-[3/4] max-w-[360px] md:max-w-none md:w-[420px] md:h-[640px]" // Increased height for full content
             style={{ perspective: '1200px' }} 
           >
             <div className="relative w-full h-full transform-style-3d">
@@ -290,10 +279,11 @@ export default function ServicesSection() {
                     key={index}
                     ref={el => cardsRef.current[index] = el}
                     onClick={() => navigate(service.link)}
-                    // Added bg-black fallback to gradient to prevent transparency issues
-                    className={`absolute inset-0 rounded-[2rem] p-6 md:p-8 flex flex-col border border-white/10 shadow-2xl overflow-hidden bg-[#050505] bg-gradient-to-br ${service.theme} will-change-transform cursor-pointer hover:border-white/30 transition-colors`}
+                    className={`absolute inset-0 rounded-[2rem] p-6 md:p-8 flex flex-col border border-white/10 shadow-2xl overflow-hidden bg-gradient-to-br ${service.theme} cursor-pointer group hover:border-white/30 transition-colors duration-300`}
                     style={{ 
                         boxShadow: '0 0 0 1px rgba(255,255,255,0.05), 0 20px 50px -10px rgba(0,0,0,0.5)',
+                        willChange: 'transform, opacity, filter', 
+                        backfaceVisibility: 'hidden' 
                     }}
                     >
                     
@@ -308,8 +298,9 @@ export default function ServicesSection() {
                             </div>
                         </div>
 
+                        {/* Middle Content - Full Features */}
                         <div className="my-auto py-4">
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2.5">
                                 {service.features.map((feature, i) => (
                                     <div key={i} className="flex items-center gap-3">
                                         <div className={`p-0.5 rounded-full bg-white/10 shrink-0 ${service.accent}`}>
@@ -324,22 +315,22 @@ export default function ServicesSection() {
                         </div>
 
                         <div className="mt-auto shrink-0">
-                            <div className={`w-12 h-1 mb-5 rounded-full bg-gradient-to-r ${service.theme}`} />
+                            <div className={`w-12 h-1 mb-4 rounded-full bg-gradient-to-r ${service.theme}`} />
                             <h3 className="text-2xl md:text-3xl font-bold text-white mb-2 leading-tight">
                             {service.title}
                             </h3>
                             <p className="text-gray-300 text-xs md:text-sm font-light leading-relaxed mb-4 line-clamp-2">
-                            {service.desc}
+                              {service.desc}
                             </p>
-
-                            <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest group ${service.accent}`}>
-                            <span>Explore Details</span>
-                            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                            
+                            <div className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${service.accent} transition-transform duration-300 group-hover:translate-x-2`}>
+                            <span>View Details</span>
+                            <ArrowRight size={14} />
                             </div>
                         </div>
                     </div>
 
-                    <div className={`absolute -right-10 -top-10 w-64 h-64 rounded-full opacity-20 blur-3xl`} 
+                    <div className={`absolute -right-10 -top-10 w-64 h-64 rounded-full opacity-20 blur-3xl pointer-events-none`} 
                           style={{ background: service.bgAccent }} />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
                     </div>
@@ -359,10 +350,10 @@ export default function ServicesSection() {
                  return (
                    <div 
                       key={idx} 
-                      onClick={() => handleNavClick(s.link)} 
-                      className={`group flex items-center gap-6 transition-all duration-500 ease-out cursor-pointer ${isActive ? 'translate-x-4' : 'hover:translate-x-1'}`}
+                      onClick={() => navigate(s.link)}
+                      className={`group flex items-center gap-6 transition-all duration-500 ease-out cursor-pointer ${isActive ? 'translate-x-4' : 'hover:translate-x-2'}`}
                    >
-                      <div className={`relative z-10 w-4 h-4 rounded-full border-2 transition-all duration-300 ${isActive ? `bg-[#050505] border-${s.accent.split('-')[1]}-500 scale-125` : 'bg-[#050505] border-white/20 group-hover:border-white/50'}`}>
+                      <div className={`relative z-10 w-4 h-4 rounded-full border-2 transition-all duration-300 box-content ${isActive ? `bg-[#050505] border-${s.accent.split('-')[1]}-500 scale-110` : 'bg-[#050505] border-white/20 group-hover:border-white/50'}`}>
                           {isActive && <div className={`absolute inset-0 m-auto w-1.5 h-1.5 rounded-full`} style={{ backgroundColor: s.bgAccent }} />}
                       </div>
                       <span className={`text-lg font-medium transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/30 group-hover:text-white/60'}`}>

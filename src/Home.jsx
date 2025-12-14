@@ -7,12 +7,13 @@ import TestimonialSection from "./components/Testimonials.jsx";
 const DssAbout = React.lazy(() => import("./components/DssAbout.jsx"));
 const AchievementTimeline = React.lazy(() => import("./components/Achivements.jsx"));
 const Deconstructed = React.lazy(() => import("./components/Deconstructed.jsx"));
-const PortfolioShowcase = React.lazy(() => import("./components/PortfolioShowcase.jsx"));
+// const PortfolioShowcase = React.lazy(() => import("./components/PortfolioShowcase.jsx"));
+import PortfolioShowcasenew from "./components/PortfolioShowcasenew.jsx";
 const Clients = React.lazy(() => import("./components/Clients.jsx"));
 const NewVisionMission = React.lazy(() => import("./components/NewVisionMission.jsx"));
 const UGCTestimonials = React.lazy(() => import("./components/UGCTestimonials.jsx"));
-const ContactSection = React.lazy(() => import("./components/ContactSection.jsx"));
-
+// const ContactSection = React.lazy(() => import("./components/ContactSection.jsx"));
+import  DssPhilosophy from "./components/DssPhilosophy.jsx";
 /* ✅ PRO Loader – black, no white flash */
 const Loader = () => (
   <div className="h-screen w-full bg-[#050505] flex items-center justify-center">
@@ -75,8 +76,11 @@ const Home = () => {
 
         {/* 5️⃣ Portfolio */}
         <section id="portfolio">
-          <PortfolioShowcase />
+          <PortfolioShowcasenew />
         </section>
+
+
+       
 
         {/* 6️⃣ Vision & Mission */}
         <section id="visionmission">
@@ -88,6 +92,15 @@ const Home = () => {
           <Clients />
         </section>
 
+
+
+   {/* 6️⃣ Vision & Mission */}
+        <section id="dssphilosophy">
+          <DssPhilosophy />
+        </section>
+
+
+
         {/* 8️⃣ UGC Testimonials */}
         <section id="ugc">
           <UGCTestimonials />
@@ -98,10 +111,13 @@ const Home = () => {
           <TestimonialSection />
         </section>
 
+
+
+
         {/* 🔟 Contact */}
-        <section id="contact">
+        {/* <section id="contact">
           <ContactSection />
-        </section>
+        </section> */}
       </Suspense>
     </div>
   );

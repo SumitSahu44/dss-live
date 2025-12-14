@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import gsap from 'https://esm.sh/gsap';
-import { ScrollTrigger } from 'https://esm.sh/gsap/ScrollTrigger';
+import React, { useLayoutEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -9,62 +9,59 @@ export default function VisionMissionReveal() {
   const missionSectionRef = useRef(null);
   const visionContentRef = useRef(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = containerRef.current;
     const missionSection = missionSectionRef.current;
     const visionContent = visionContentRef.current;
-    
+
     let ctx = gsap.context(() => {
-      
-      // SINGLE TIMELINE (Sab kuch ek saath control hoga)
+      // Initial states - prevents any flash or wrong positioning
+      gsap.set(missionSection, { xPercent: 100, opacity: 0 }); // fully hidden at start
+      gsap.set(visionContent, { opacity: 1, scale: 1, filter: 'blur(0px)' });
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: container,
           start: 'top top',
-          end: '+=200%', // Scroll distance thoda adjust kiya for better feel
+          end: '+=300%', // Lamba scroll area for slower & smoother reveal
           pin: true,
-          scrub: 1, // Smoothness ke liye
-          anticipatePin: 1
+          scrub: 1, // Smooth lag feel (1 second catch-up)
+          anticipatePin: 1, // Prevents pin flicker on fast scroll
+          invalidateOnRefresh: true,
+          // markers: true, // Debug ke liye uncomment kar sakte ho
         }
       });
 
-      // Animation Steps:
-      // Jaise hi scroll start hoga, Vision thoda fade/scale hoga aur Mission aana shuru hoga
-      
+      // Vision fade out with depth
       tl.to(visionContent, {
-        scale: 0.9,       // Thoda piche bhejne ka effect
-        opacity: 0.2,     // Dheere dheere gayab
-        duration: 1,
-        ease: "power1.out"
+        scale: 0.92,
+        opacity: 0,
+        filter: 'blur(8px)',
+        duration: 1.2,
+        ease: 'power2.out',
       })
+      // Mission slide in simultaneously but slightly delayed feel
       .to(missionSection, {
-        x: '0%',          // Right se center slide
-        ease: "power1.inOut", 
-        duration: 1       // Vision ke fade hone ke saath hi ye slide hoga
-      }, "<");            // symbol "<" ka matlab hai: Previous animation ke saath start karo
+        xPercent: 0,
+        opacity: 1,
+        duration: 1.4,
+        ease: 'power3.out', // More natural & premium slide
+      }, '-=0.8'); // Overlap for smoother transition
 
     }, container);
 
-    return () => ctx.revert();
+    return () => ctx.revert(); // Proper cleanup - Strict Mode mein bhi safe
   }, []);
 
   return (
     <div className="bg-black" id="visionmission">
-      
-      {/* --- MAIN CONTAINER (Pinned) --- */}
       <div ref={containerRef} className="relative h-screen w-full overflow-hidden">
 
-        {/* =========================================
-            LAYER 1: OUR VISION (Base Layer) 
-           ========================================= */}
+        {/* LAYER 1: OUR VISION (Base) */}
         <div className="absolute inset-0 w-full h-full bg-[#050505] flex items-center justify-center p-8 md:p-20">
-          
-          {/* Background Decor */}
           <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#0078f0]/10 blur-[150px] rounded-full pointer-events-none" />
-          
-          {/* Ref added here for animation */}
-          <div ref={visionContentRef} className="relative z-10 grid md:grid-cols-2 gap-12 max-w-7xl w-full items-center origin-center">
-            
+
+          <div ref={visionContentRef} className="relative z-10 grid md:grid-cols-2 gap-12 max-w-7xl w-full items-center">
             <div className="space-y-6">
               <h2 className="text-[#0078f0] font-bold tracking-widest uppercase text-sm">The Dream</h2>
               <h1 className="text-6xl md:text-8xl font-bold text-white leading-none">
@@ -85,29 +82,22 @@ export default function VisionMissionReveal() {
                 the level of digital presence and branding they need.
               </p>
             </div>
-
           </div>
-          
+
           <h1 className="absolute bottom-[-5%] left-[-5%] text-[20vw] font-black text-white/[0.02] pointer-events-none select-none">
             VISION
           </h1>
         </div>
 
-
-        {/* =========================================
-            LAYER 2: OUR MISSION (Sliding Panel) 
-           ========================================= */}
-        <div 
+        {/* LAYER 2: OUR MISSION (Sliding from right) */}
+        <div
           ref={missionSectionRef}
-          className="absolute inset-0 w-full h-full bg-[#ff9f20] text-black flex items-center justify-center p-8 md:p-20 translate-x-[100%] z-20"
-          style={{
-             boxShadow: '-50px 0 100px rgba(0,0,0,0.5)'
-          }}
+          className="absolute inset-0 w-full h-full bg-[#ff9f20] text-black flex items-center justify-center p-8 md:p-20 z-20"
+          style={{ boxShadow: '-50px 0 100px rgba(0,0,0,0.6)' }}
         >
-          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-multiply" />
+          <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-multiply pointer-events-none" />
 
           <div className="relative z-10 grid md:grid-cols-2 gap-12 max-w-7xl w-full items-center">
-            
             <div className="order-2 md:order-1 text-gray-900 text-lg md:text-xl leading-relaxed space-y-6 border-l-4 border-black pl-8">
               <p className="font-bold text-2xl">
                 Our mission is to create real impact.
@@ -127,13 +117,11 @@ export default function VisionMissionReveal() {
               </h1>
               <div className="h-2 w-32 bg-black rounded-full mt-4 ml-auto" />
             </div>
-
           </div>
 
           <h1 className="absolute top-[-5%] right-[-5%] text-[20vw] font-black text-black/[0.05] pointer-events-none select-none">
             MISSION
           </h1>
-
         </div>
 
       </div>

@@ -1,195 +1,170 @@
-import React, { useEffect, useRef } from 'react';
-import gsap from 'https://esm.sh/gsap';
-import { ScrollTrigger } from 'https://esm.sh/gsap/ScrollTrigger';
-import { MapPin, ArrowUpRight, Users, Monitor, Briefcase, Trophy } from 'lucide-react';
-import { HashLink } from "react-router-hash-link";
+import React, { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  MapPin,
+  Trophy,
+  Target,
+  Rocket,
+} from "lucide-react";
+
 gsap.registerPlugin(ScrollTrigger);
 
-const stats = [
-  { label: "Years Experience", value: 5, suffix: "+", icon: Trophy, color: "text-yellow-500" },
-  { label: "Projects Completed", value: 1600, suffix: "+", icon: Briefcase, color: "text-blue-500" },
-  { label: "Happy Clients", value: 950, suffix: "+", icon: Users, color: "text-green-500" },
-  { label: "Ad Budget Managed", value: 10, suffix: " Cr+", icon: ArrowUpRight, color: "text-orange-500" },
-  { label: "Websites Built", value: 350, suffix: "+", icon: Monitor, color: "text-purple-500" },
-  { label: "Team Experts", value: 30, suffix: "+", icon: Users, color: "text-pink-500" },
-  { label: "Active Clients", value: 120, suffix: "+", icon: Users, color: "text-cyan-500" },
-  { label: "Industries Served", value: 40, suffix: "+", icon: Briefcase, color: "text-indigo-500" },
-];
-
 export default function AboutSection() {
-  const containerRef = useRef(null);
-  const counterRefs = useRef([]);
+  const sectionRef = useRef(null);
+  const cardsRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
       
-      // 1. Text Animation
-      gsap.from(".reveal-text", {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 75%",
+      // 1. HEADING ANIMATION (Thoda jaldi trigger hoga)
+      gsap.fromTo(".anim-heading", 
+        { y: 30, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 85%", // Screen ke 85% pe aate hi chalega
+          },
         }
-      });
+      );
 
-      // 2. Stats Counter Animation
-      counterRefs.current.forEach((el, index) => {
-        if (!el) return;
-        const targetValue = stats[index].value;
-        
-        gsap.to(el, {
-            innerText: targetValue,
-            duration: 2,
-            snap: { innerText: 1 }, // Integers only
-            ease: "power2.out",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top 70%",
-            },
-            onUpdate: function() {
-                el.innerHTML = Math.ceil(this.targets()[0].innerText) + stats[index].suffix;
-            }
-        });
-      });
-
-      // 3. Image Parallax
-      gsap.to(".about-image", {
-        yPercent: 20,
-        ease: "none",
-        scrollTrigger: {
-            trigger: containerRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true
+      // 2. IMAGE REVEAL
+      gsap.fromTo(".hero-img-container",
+        { x: 30, opacity: 0 },
+        {
+          x: 0,
+          opacity: 1,
+          duration: 1,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 80%",
+          },
         }
-      });
+      );
 
-    }, containerRef);
+      // 3. CARDS ANIMATION (Fixed: Ab visible honge)
+      // Hum 'fromTo' use kar rahe hain taaki state guarantee rahe
+      gsap.fromTo(".content-card", 
+        { y: 40, opacity: 0 }, 
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.6, // Fast animation
+          stagger: 0.1, // Jaldi ek ke baad ek aayenge
+          ease: "power1.out",
+          scrollTrigger: {
+            trigger: cardsRef.current,
+            start: "top 95%", // Screen ke bottom touch karte hi start hoga (No Waiting)
+            toggleActions: "play none none none", // Sirf ek baar play hoga smooth rehne ke liye
+          },
+        }
+      );
+
+    }, sectionRef);
 
     return () => ctx.revert();
   }, []);
 
   return (
-    <section ref={containerRef} id="about" className="relative py-24 px-4 md:px-8 bg-[#050505] overflow-hidden">
-      
-      {/* Background Ambience */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#0078f0]/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#ff9f20]/5 rounded-full blur-[120px] pointer-events-none" />
+    <section
+      ref={sectionRef}
+      id="about"
+      className="relative py-20 md:py-32 bg-[#050505] text-white overflow-hidden"
+    >
+      {/* --- BACKGROUND AMBIENCE --- */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         
-        {/* --- TOP SECTION: CONTENT --- */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20 items-center">
-            
-            {/* Left: Text Content */}
-            <div>
-                <div className="reveal-text inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs font-bold uppercase tracking-widest text-[#ff9f20] mb-6">
-                    <MapPin size={14} />
-                    Based in Indore, India
-                </div>
-                
-                <h2 className="reveal-text text-4xl md:text-6xl font-black text-white leading-tight mb-6">
-                    We Don't Just Build <br/>
-                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-400 to-gray-600">
-                        We Accelerate Growth.
-                    </span>
-                </h2>
-                
-                <p className="reveal-text text-gray-400 text-lg leading-relaxed mb-6">
-                    <span className="text-white font-semibold">Digital Success Solutions</span> is a creative powerhouse tailored for bold startups and established brands. We merge data-driven performance with compelling storytelling.
-                </p>
-
-                <p className="reveal-text text-gray-500 leading-relaxed mb-8">
-                    From crafting your first pixel-perfect website to managing multi-crore ad budgets, we are the engine behind your digital dominance. We turn casual visitors into loyal customers.
-                </p>
-
-         <HashLink smooth to="/#work">
-  <button className="reveal-text group relative px-8 py-3 bg-white text-black font-bold uppercase text-xs tracking-widest rounded-full overflow-hidden hover:scale-105 transition-transform duration-300">
-    <span className="relative z-10 group-hover:text-white transition-colors">
-      Explore our Works
-    </span>
-    <div className="absolute inset-0 bg-[#0078f0] translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
-  </button>
-</HashLink>
-               
+        {/* --- TOP SECTION: HEADING & IMAGE --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center mb-24">
+          
+          {/* Left: Heading */}
+          <div className="anim-heading opacity-0"> {/* Initial opacity 0 handle kiya CSS se */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#FF9F20]/30 bg-[#FF9F20]/10 text-xs font-bold uppercase tracking-widest text-[#FF9F20] mb-6">
+              <MapPin size={12} />
+              Indore, Madhya Pradesh
             </div>
 
-            {/* Right: Visual Composition */}
-            <div className="relative">
-                {/* Main Image Frame */}
-                <div className="relative rounded-2xl overflow-hidden border border-white/10 shadow-2xl aspect-[4/3] group">
-                     {/* Overlay Gradient */}
-                     <div className="absolute inset-0 bg-gradient-to-tr from-black/60 to-transparent z-10" />
-                     
-                     <img 
-                        src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800" 
-                        alt="Team Brainstorming" 
-                        className="about-image w-full h-[120%] object-cover object-top opacity-80 group-hover:opacity-100 transition-opacity duration-700 grayscale hover:grayscale-0"
-                     />
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.15] mb-6 tracking-tight">
+              We Are The Best <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-gray-200 to-gray-500">
+                Digital Marketing Company
+              </span>
+              <span className="block mt-2">in Indore.</span>
+            </h1>
 
-                     {/* Floating Badge */}
-                     <div className="absolute bottom-6 left-6 z-20 bg-black/70 backdrop-blur-xl border border-white/10 p-4 rounded-xl shadow-lg">
-                        <div className="flex items-center gap-3">
-                            <div className="flex -space-x-3">
-                                {[1,2,3].map(i => (
-                                    <div key={i} className="w-8 h-8 rounded-full border-2 border-black bg-gray-600 flex items-center justify-center text-[8px] text-white">
-                                        <img src={`https://i.pravatar.cc/100?img=${i+10}`} className="w-full h-full rounded-full" alt="Team" />
-                                    </div>
-                                ))}
-                            </div>
-                            <div className="text-white text-xs font-bold">
-                                30+ Creative <br/> <span className="text-gray-400 font-normal">Minds</span>
-                            </div>
-                        </div>
-                     </div>
-                </div>
+            <p className="text-lg text-gray-400 max-w-lg leading-relaxed border-l-2 border-blue-600 pl-6">
+              Transforming brands with data-driven strategies and creative innovation for over 7 years.
+            </p>
+          </div>
 
-                {/* Decorative Elements */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 border border-white/20 rounded-full animate-spin-slow" />
+          {/* Right: Hero Image */}
+          <div className="hero-img-container opacity-0 relative rounded-2xl overflow-hidden aspect-video lg:aspect-auto lg:h-[400px] border border-white/10 shadow-2xl group">
+             <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-all duration-500 z-10" />
+             <img
+              src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=1200"
+              alt="Digital Marketing Team"
+              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+            />
+            {/* Badge */}
+            <div className="absolute bottom-5 right-5 z-20 bg-black/80 backdrop-blur-md px-6 py-4 rounded-xl border border-white/10 shadow-lg">
+                <span className="block text-3xl font-bold text-white">7+</span>
+                <span className="text-xs text-gray-400 uppercase tracking-widest">Years Experience</span>
             </div>
+          </div>
         </div>
 
-        {/* --- BOTTOM SECTION: BENTO GRID STATS --- */}
-        <div className="reveal-text">
-            <h3 className="text-white font-bold mb-6 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#0078f0]" />
-                Impact by the Numbers
-            </h3>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {stats.map((stat, i) => {
-                    const Icon = stat.icon;
-                    return (
-                        <div 
-                            key={i} 
-                            className="group p-6 rounded-2xl bg-[#0a0a0a] border border-white/5 hover:border-[#ff9f20]/30 hover:bg-white/[0.02] transition-all duration-300 relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 group-hover:scale-110 transition-all duration-300">
-                                <Icon size={40} />
-                            </div>
-                            
-                            <div className={`mb-2 ${stat.color} opacity-80 group-hover:opacity-100`}>
-                                <Icon size={20} />
-                            </div>
-                            
-                            <div 
-                                ref={el => counterRefs.current[i] = el}
-                                className="text-3xl md:text-4xl font-black text-white mb-1 tracking-tight"
-                            >
-                                0
-                            </div>
-                            
-                            <div className="text-xs md:text-sm text-gray-500 font-medium uppercase tracking-wide group-hover:text-gray-400">
-                                {stat.label}
-                            </div>
-                        </div>
-                    )
-                })}
+        {/* --- CONTENT CARDS SECTION --- */}
+        <div ref={cardsRef} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          {/* Card 1: Legacy & Expertise */}
+          <div className="content-card opacity-0 group relative p-8 bg-[#111] border border-white/5 rounded-2xl hover:border-blue-500/30 transition-all duration-300 hover:-translate-y-2">
+           
+            <div className="w-12 h-12 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-500 mb-6">
+                <Trophy size={24} />
             </div>
+            
+            <h3 className="text-xl font-bold text-white mb-4">Leading Expertise</h3>
+            <p className="text-sm text-gray-400 leading-7">
+              Our <span className="text-white font-semibold">7-year-old</span> digital marketing company provides leading services in Indore, where we've delivered real growth to major brands through social media marketing, SEO, and creative marketing. For every service, we have expert professionals who leverage the latest innovations to elevate your brand.
+            </p>
+          </div>
+
+          {/* Card 2: Strategy & ROI */}
+          <div className="content-card opacity-0 group relative p-8 bg-[#111] border border-white/5 rounded-2xl hover:border-orange-500/30 transition-all duration-300 hover:-translate-y-2">
+           
+
+            <div className="w-12 h-12 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500 mb-6">
+                <Target size={24} />
+            </div>
+
+            <h3 className="text-xl font-bold text-white mb-4">Customized Campaigns</h3>
+            <p className="text-sm text-gray-400 leading-7">
+              We create customized digital marketing campaigns—from top <span className="text-white font-semibold">Google rankings</span> through SEO, brand awareness through social media, and <span className="text-white font-semibold">measurable ROI</span> through performance campaigns. Our focus isn't just on leads, but on driving sustainable growth for your business.
+            </p>
+          </div>
+
+          {/* Card 3: Competitive Edge */}
+          <div className="content-card opacity-0 group relative p-8 bg-[#111] border border-white/5 rounded-2xl hover:border-emerald-500/30 transition-all duration-300 hover:-translate-y-2">
+           
+
+            <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500 mb-6">
+                <Rocket size={24} />
+            </div>
+
+            <h3 className="text-xl font-bold text-white mb-4">Competitive Edge</h3>
+            <p className="text-sm text-gray-400 leading-7">
+              Choose our digital marketing company in Indore to make your business strong and competitive. <span className="text-white font-semibold">Professional strategies</span>, results-focused approach, and innovation are our signature tools that will give your brand a new identity in the digital world.
+            </p>
+          </div>
+
         </div>
 
       </div>

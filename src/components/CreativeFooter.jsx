@@ -1,19 +1,12 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react"; // useEffect hata diya kyunki ab animation nahi hai
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
-// GSAP Imports
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // Icons Import
 import { FaLinkedinIn, FaInstagram, FaFacebookF } from "react-icons/fa6";
 import { FaXTwitter } from "react-icons/fa6"; 
 
-gsap.registerPlugin(ScrollTrigger);
-
 export default function Footer() {
   const footerRef = useRef(null);
-  const ctaRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -75,38 +68,6 @@ export default function Footer() {
     },
   ];
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      
-      // 1. Reveal Footer Content
-      gsap.fromTo(footerRef.current.children, 
-        { y: 30, opacity: 0 },
-        {
-          y: 0, opacity: 1, duration: 0.8, stagger: 0.1, ease: "power3.out",
-          scrollTrigger: {
-            trigger: footerRef.current,
-            start: "top 90%",
-          }
-        }
-      );
-
-      // 2. Background Text Parallax
-      gsap.to(".footer-bg-text", {
-        y: -30,
-        ease: "none",
-        scrollTrigger: {
-          trigger: footerRef.current,
-          start: "top bottom",
-          end: "bottom bottom",
-          scrub: 1
-        }
-      });
-
-    }, footerRef);
-
-    return () => ctx.revert();
-  }, []);
-
   return (
     <footer 
       ref={footerRef}
@@ -122,8 +83,8 @@ export default function Footer() {
          <div className="absolute bottom-0 left-[-20%] w-[50vw] h-[50vw] bg-[#0078f0]/5 rounded-full blur-[120px]" />
          <div className="absolute top-0 right-[-20%] w-[50vw] h-[50vw] bg-[#ff9f20]/5 rounded-full blur-[120px]" />
 
-         {/* BACKGROUND TEXT (Size Reduced) */}
-         <div className="footer-bg-text absolute bottom-0 left-0 w-full text-center pointer-events-none select-none overflow-hidden">
+         {/* BACKGROUND TEXT */}
+         <div className="absolute bottom-0 left-0 w-full text-center pointer-events-none select-none overflow-hidden">
             <h1 className="text-[15vw] font-black text-white/[0.03] leading-none tracking-tighter">
                DSS
             </h1>
@@ -132,8 +93,8 @@ export default function Footer() {
 
       <div className="container mx-auto px-6 relative z-10">
         
-        {/* --- 1. CALL TO ACTION (Refined Size) --- */}
-        <div ref={ctaRef} className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 pb-16 border-b border-white/10">
+        {/* --- 1. CALL TO ACTION --- */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 pb-16 border-b border-white/10">
            <div className="max-w-2xl">
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-[1.1] mb-4">
                  READY TO <br/>
@@ -145,10 +106,12 @@ export default function Footer() {
            </div>
            
            {/* CTA Button */}
-           <button onClick={() => goToSection("#contact")} className="group relative mt-8 md:mt-0 inline-flex items-center justify-center px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs md:text-sm overflow-hidden rounded-full transition-transform hover:scale-105">
+           <Link to="/LetsConnect" className="group relative mt-8 md:mt-0 inline-flex items-center justify-center px-8 py-4 bg-white text-black font-bold uppercase tracking-widest text-xs md:text-sm overflow-hidden rounded-full transition-transform hover:scale-105">
+       
               <span className="relative z-10 group-hover:text-white transition-colors duration-300">Start Project</span>
               <div className="absolute inset-0 bg-[#0078f0] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-           </button>
+        
+           </Link>
         </div>
 
         {/* --- 2. MAIN GRID LINKS --- */}
@@ -175,35 +138,73 @@ export default function Footer() {
            <div className="col-span-1 md:col-span-2 md:col-start-6">
               <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-4">Explore</h4>
               <ul className="flex flex-col gap-3 text-gray-400 text-sm">
-                 {[
-                   { name: 'Home', hash: '#hero' },
-                   { name: 'Work', hash: '#work' },
-                   { name: 'Services', hash: '#services' },
-                   { name: 'About', hash: '#about' },
-                   { name: 'Contact', hash: '#contact' }
-                 ].map(item => (
-                    <li key={item.name}>
-                       <button onClick={() => goToSection(item.hash)} className="hover:text-[#ff9f20] transition-colors flex items-center gap-2 group w-full text-left">
-                          <span className="w-0 group-hover:w-2 h-[1px] bg-[#ff9f20] transition-all duration-300" />
-                          {item.name}
-                       </button>
-                    </li>
-                 ))}
-              </ul>
+  <li>
+    <Link to="/" className="hover:text-[#ff9f20] transition-colors flex items-center gap-2 group">
+      <span className="w-0 group-hover:w-2 h-[1px] bg-[#ff9f20] transition-all duration-300" />
+      Home
+    </Link>
+  </li>
+
+  <li>
+    <Link to="/about" className="hover:text-[#ff9f20] transition-colors flex items-center gap-2 group">
+      <span className="w-0 group-hover:w-2 h-[1px] bg-[#ff9f20] transition-all duration-300" />
+      Who We Are
+    </Link>
+  </li>
+
+  <li>
+    <Link to="/PortfolioPage" className="hover:text-[#ff9f20] transition-colors flex items-center gap-2 group">
+      <span className="w-0 group-hover:w-2 h-[1px] bg-[#ff9f20] transition-all duration-300" />
+      Portfolio
+    </Link>
+  </li>
+
+   <li>
+    <Link to="/LetsConnect" className="hover:text-[#ff9f20] transition-colors flex items-center gap-2 group">
+      <span className="w-0 group-hover:w-2 h-[1px] bg-[#ff9f20] transition-all duration-300" />
+      Lets Talk
+    </Link>
+  </li>
+</ul>
+
            </div>
 
            {/* Column 3: Services */}
            <div className="col-span-1 md:col-span-3">
               <h4 className="text-xs font-bold uppercase tracking-widest text-white mb-4">Services</h4>
-              <ul className="flex flex-col gap-3 text-gray-400 text-sm">
-                 {['Website Development', 'Digital Marketing', 'Social Media Management', 'SEO Optimization', 'Branding & Designing'].map(item => (
-                    <li key={item}>
-                       <Link to="/services" className="hover:text-[#0078f0] transition-colors">
-                          {item}
-                       </Link>
-                    </li>
-                 ))}
-              </ul>
+            <ul className="flex flex-col gap-3 text-gray-400 text-sm">
+  <li>
+    <Link to="/website-design-and-website-development" className="hover:text-[#0078f0] transition-colors">
+      Website Development
+    </Link>
+  </li>
+  <li>
+    <Link to="/performance-marketing-ppc" className="hover:text-[#0078f0] transition-colors">
+      Performance Marketing
+    </Link>
+  </li>
+  <li>
+    <Link to="/social-media-marketing" className="hover:text-[#0078f0] transition-colors">
+      Social Media
+    </Link>
+  </li>
+  <li>
+    <Link to="/search-engine-optimization" className="hover:text-[#0078f0] transition-colors">
+      SEO Optimization
+    </Link>
+  </li>
+  <li>
+    <Link to="/influencer-marketing" className="hover:text-[#0078f0] transition-colors">
+      Influencer Marketing
+    </Link>
+  </li>
+  <li>
+    <Link to="/e-commerce-applications" className="hover:text-[#0078f0] transition-colors">
+      E-Commerce Apps
+    </Link>
+  </li>
+</ul>
+
            </div>
 
            {/* Column 4: Contact & Socials */}
