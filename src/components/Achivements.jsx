@@ -54,7 +54,7 @@ const features = [
     title: "Dedicated Marketing Manager",
     desc: "Every client gets a dedicated expert who manages communication, strategy, execution, and reporting. We collaborate closely with you to understand your specific business challenges.",
     color: "text-[#0078f0]", 
-    img: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" // Professional Manager
+    img: "https://media.istockphoto.com/id/2163365819/photo/group-of-business-persons-talking-in-the-office.webp?a=1&b=1&s=612x612&w=0&k=20&c=QYpmadCi2vj6XNxuF2kZilI9k8dXfi8KLMjqDpxuO6U=" // Professional Manager
   },
   {
     number: "07",

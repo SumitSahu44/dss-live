@@ -74,7 +74,7 @@ const App = () => {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
             <Route path="/LetsConnect" element={<LetsConnect />} />
-          
+            <Route path="/contact-us" element={<LetsConnect />} />
         </Routes>
       </Suspense>
 
