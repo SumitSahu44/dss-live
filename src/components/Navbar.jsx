@@ -84,14 +84,14 @@ export default function Navbar() {
         {/* Glass Background */}
         <div className="absolute inset-0 bg-[#050505]/80 backdrop-blur-xl rounded-full border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]" />
 
-        <div className="relative px-6 py-3 flex items-center justify-between">
+        <div className="relative px-6 py-1.5 flex items-center justify-between">
           
           {/* LOGO */}
           <Link to="/" className="flex items-center z-20 mr-8">
             <img
               src="/images/logo.png"
               alt="Brand Logo"
-              className="h-10 w-auto object-contain hover:opacity-80 transition-opacity"
+              className="h-17 w-auto object-contain hover:opacity-80 transition-opacity"
             />
           </Link>
 
@@ -129,7 +129,7 @@ export default function Navbar() {
                 {/* MEGA MENU DROPDOWN */}
                 <div 
                     ref={dropdownRef}
-                    className="absolute top-[calc(100%+10px)] left-1/2 -translate-x-1/2 w-[600px] bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 grid grid-cols-2 gap-4 shadow-2xl origin-top z-[60]"
+                    className="absolute top-[calc(100%+20px)] left-1/2 -translate-x-1/2 w-[600px] bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 grid grid-cols-2 gap-4 shadow-2xl origin-top z-[60]"
                     style={{ display: 'none', opacity: 0, visibility: 'hidden' }}
                 >
                     {/* Decorative Arrow */}
@@ -190,7 +190,7 @@ export default function Navbar() {
       {/* MOBILE MENU */}
       <div
         ref={mobileMenuRef}
-        className="fixed top-24 left-4 right-4 z-40 md:hidden bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 opacity-0 -translate-y-4 shadow-2xl max-h-[80vh] overflow-y-auto"
+        className="fixed top-28 left-4 right-4 z-40 md:hidden bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 opacity-0 -translate-y-4 shadow-2xl max-h-[80vh] overflow-y-auto"
       >
         <nav className="flex flex-col gap-2">
           <button 

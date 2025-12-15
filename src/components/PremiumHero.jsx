@@ -170,7 +170,7 @@ const HeroSection = () => {
 
       {/* CTA */}
       <div className="hero-cta z-10 mb-24 opacity-0">
-        <HashLink smooth to="/#contact">
+        <HashLink smooth to="/LetsConnect">
           <button className="px-12 py-5 rounded-full bg-[#0078f0] text-white font-bold uppercase tracking-wider transition-all duration-500 hover:scale-105 hover:bg-[#ff9f20] hover:shadow-[0_0_50px_-10px_#ff9f20]">
             Start Your Journey
           </button>

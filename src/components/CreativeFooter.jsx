@@ -253,7 +253,7 @@ export default function Footer() {
         {/* --- 3. BOTTOM BAR (Legal) --- */}
         <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-white/5 text-[10px] md:text-xs text-gray-600 font-mono uppercase tracking-wider gap-4 md:gap-0">
            <div className="flex gap-6">
-              <span>© 2024 DSS Digital Success Solutions LLP</span>
+              <span>© 2025 DSS Digital Success Solutions LLP</span>
            </div>
            
            <div className="flex flex-wrap justify-center gap-6 md:gap-8">
