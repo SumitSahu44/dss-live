@@ -18,7 +18,7 @@ const HeroBg = () => {
       {/* Mobile Video */}
       <video
         className="block md:hidden w-full h-full object-cover"
-        src="/videos/hero-mobile.mp4"
+        src="/videos/hero-phone.mp4"
         autoPlay
         loop
         muted

@@ -232,7 +232,7 @@ export default function AboutSection() {
           />
           <FeatureCard 
             icon={<Rocket />} 
-            title="7 Years of Growth" 
+            title="5 Years of Growth" 
             desc="A legacy of delivering real growth to major brands. We don't just market; we build sustainable digital assets."
             color="blue"
           />

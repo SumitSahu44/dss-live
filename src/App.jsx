@@ -1,8 +1,8 @@
 import React, { useEffect, Suspense } from "react";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 // --- COMPONENTS ---
-
 import CustomCursor from "./components/CustomCursor.jsx";
 import Navbar from "./components/Navbar.jsx";
 import Preloader from "./components/Preloader.jsx";
@@ -10,8 +10,8 @@ import CreativeFooter from "./components/CreativeFooter.jsx";
 import Home from "./Home.jsx";
 import AboutPage from "./components/AboutPage.jsx";
 import PortfolioPage from "./components/PortfolioPage.jsx";
-// --- PAGES ---
 
+// --- PAGES ---
 import PerformanceMarketing from "./components/PerformanceMarketing.jsx";
 import SocialMediaMarketing from "./components/SocialMediaMarketing.jsx";
 import SearchEngineOptimization from "./components/SeoOptimization.jsx";
@@ -19,32 +19,25 @@ import InfluencerMarketing from "./components/InfluencerMarketing.jsx";
 import ECommerceApplications from "./components/EcommerceApplications.jsx";
 import Webdev from "./components/Webdev.jsx";
 import LetsConnect from "./components/LetsConnect.jsx";
-import BlogList from './components/BlogList';
-import BlogDetail from './components/BlogDetail';
-
-// Lazy Loaded Pages (Inke liye Suspense zaroori hai)
-// React.lazy(() => import("./components/PrivacyPolicy.jsx"));
+import BlogList from "./components/BlogList";
+import BlogDetail from "./components/BlogDetail";
+import RichAdmin from "./components/AdminPanel.jsx";
+// Lazy Loaded Pages
 const PrivacyPolicy = React.lazy(() => import("./components/PrivacyPolicy.jsx"));
 const TermsAndConditions = React.lazy(() => import("./components/TermsAndConditions.jsx"));
-// import AdminPanel from "./AdminPanel.jsx"; // Removed as per user request (build fix)
 
-// ✅ ULTIMATE SCROLL HANDLER (Top + Hash)
+/* ================= SCROLL CONTROLLER ================= */
 function ScrollController() {
   const { pathname, hash } = useLocation();
 
   useEffect(() => {
-    // Agar URL me #hash hai (Jaise /#contact)
     if (hash) {
       setTimeout(() => {
         const el = document.querySelector(hash);
-        if (el) {
-          el.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 500); // Thoda delay taaki content load ho jaye
-    }
-    // Agar normal page change hai (Jaise Home -> Services)
-    else {
-      window.scrollTo(0, 0); // PAGE KO TOP PE FEK DO
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 500);
+    } else {
+      window.scrollTo(0, 0);
     }
   }, [pathname, hash]);
 
@@ -52,24 +45,84 @@ function ScrollController() {
 }
 
 const App = () => {
+  /* ================= GLOBAL SCHEMA ================= */
+
+    /* ================= GLOBAL SCHEMA ================= */
+const isAdmin = location.pathname === "/adminsurendraseo";
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Digital Success Solutions",
+    "alternateName": "DSS",
+    "url": "https://digitalsuccesssolutions.in",
+    "logo": "https://digitalsuccesssolutions.in/logo.png",
+    "description":
+      "Digital Success Solutions is a full-service digital marketing agency providing SEO, PPC, social media marketing, web development, ecommerce solutions, and branding services.",
+    "foundingDate": "2022",
+    "sameAs": [
+      "https://www.facebook.com/p/Digital-Success-Solutions-61567317789854/",
+      "https://www.instagram.com/digitalsuccess_solutions/",
+      "https://www.linkedin.com/company/digital-success-solutions-dss/"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "availableLanguage": ["English"]
+    }
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Digital Success Solutions",
+    "url": "https://digitalsuccesssolutions.in",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target":
+        "https://digitalsuccesssolutions.in/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+
   return (
     <BrowserRouter>
 
-      {/* 1. Scroll Logic sabse upar */}
+      {/* ========== GLOBAL SEO + SCHEMA ========== */}
+    <Helmet>
+  <title>Digital Success Solutions – Digital Marketing Agency</title>
+  <meta
+    name="description"
+    content="Digital Success Solutions helps businesses grow with SEO, PPC, social media marketing, web development, ecommerce solutions and branding."
+  />
+
+  <script type="application/ld+json">
+    {JSON.stringify(organizationSchema)}
+  </script>
+
+  <script type="application/ld+json">
+    {JSON.stringify(websiteSchema)}
+  </script>
+</Helmet>
+
+
+      {/* Scroll Logic */}
       <ScrollController />
 
-      {/* 2. Global Components */}
+      {/* Global Components */}
       <Preloader />
       <CustomCursor />
-      <Navbar />
+      {/* Navbar sirf tab dikhega jab route admin wala nahi hoga */}
+      {!isAdmin && <Navbar />}
 
-      {/* 3. Routes with Suspense (Loading State) */}
-      <Suspense fallback={<div className="h-screen w-full bg-[#050505]"></div>}>
+      {/* Routes */}
+      <Suspense fallback={<div className="h-screen w-full bg-[#050505]" />}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/About" element={<AboutPage />} />
-          <Route path="/PortfolioPage" element={<PortfolioPage />} />
-          {/* Services Routes */}
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/portfoliopage" element={<PortfolioPage />} />
+
+          {/* Services */}
           <Route path="/website-design-and-website-development" element={<Webdev />} />
           <Route path="/performance-marketing-ppc" element={<PerformanceMarketing />} />
           <Route path="/social-media-marketing" element={<SocialMediaMarketing />} />
@@ -77,29 +130,23 @@ const App = () => {
           <Route path="/influencer-marketing" element={<InfluencerMarketing />} />
           <Route path="/e-commerce-applications" element={<ECommerceApplications />} />
 
-
-          {/* Home Page: Cards Dikhenge */}
+          {/* Blogs */}
           <Route path="/blogs" element={<BlogList />} />
-          {/* <Route path="/Admin" element={<AdminPanel />} /> */}
+          <Route path="/blog/:title" element={<BlogDetail />} />
 
-          {/* Detail Page: Jab card click hoga (:id dynamic hai) */}
-          <Route path="/blog/:id" element={<BlogDetail />} />
-
-          {/* Legal Pages */}
+          {/* Legal + Contact */}
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="/LetsConnect" element={<LetsConnect />} />
           <Route path="/contact-us" element={<LetsConnect />} />
 
 
-
-
-
+          <Route path="/adminsurendraseo" element={<RichAdmin />} />
         </Routes>
       </Suspense>
 
-      <CreativeFooter />
-
+    {/* Footer sirf tab dikhega jab route admin wala nahi hoga */}
+      {!isAdmin && <CreativeFooter />}
     </BrowserRouter>
   );
 };

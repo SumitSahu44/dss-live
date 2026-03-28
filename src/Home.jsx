@@ -105,9 +105,9 @@ const Home = () => {
 
 
         {/* 8️⃣ UGC Testimonials */}
-        <section id="ugc">
+        {/* <section id="ugc">
           <UGCTestimonials />
-        </section>
+        </section> */}
 
         {/* 9️⃣ Normal Testimonials */}
         <section id="testimonials">

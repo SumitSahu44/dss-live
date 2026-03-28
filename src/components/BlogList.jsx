@@ -1,95 +1,107 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom'; // Keep this import
-import { blogs as staticBlogs } from './blogData'; // Rename imported static blogs
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { FiArrowUpRight, FiCalendar, FiUser } from 'react-icons/fi';
 
-const BlogList = () => {
-  const [allBlogs, setAllBlogs] = useState([]);
+const Blogs = () => {
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  // Backend se blogs fetch karna
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await axios.get('https://dssbackend.onrender.com/api/blogs');
-        const dbBlogs = response.data.map(blog => ({
-          id: blog.slug, // Use slug as ID for routing
-          title: blog.title,
-          image: blog.thumbnail ? `https://dssbackend.onrender.com/uploads/${blog.thumbnail}` : '/images/placeholder.jpg',
-          category: "Latest Update", // Default category
-          date: new Date(blog.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          author: "Digital Success Solutions",
-          excerpt: blog.content ? blog.content.replace(/<[^>]+>/g, '').substring(0, 150) + "..." : "", // Strip HTML for excerpt
-          isDynamic: true
-        }));
+        const res = await axios.get('https://digitalsuccesssolutions.in/php_backend/api/read.php');
+        let data = res.data;
 
-        // Merge static and dynamic blogs
-        setAllBlogs([...staticBlogs, ...dbBlogs]);
-      } catch (error) {
-        console.error("Error fetching blogs:", error);
-        // Fallback to static blogs if API fails
-        setAllBlogs(staticBlogs);
+        // --- BUG FIX: Handle "Connected successfully" prefix from server ---
+        if (typeof data === 'string' && data.includes('Connected successfully')) {
+          const jsonPart = data.replace('Connected successfully', '').trim();
+          try {
+            data = JSON.parse(jsonPart);
+          } catch (e) {
+            console.error("Failed to parse fixed JSON", e);
+          }
+        }
+
+        if (Array.isArray(data)) {
+          setBlogs(data);
+        } else {
+          setBlogs([]);
+        }
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setBlogs([]);
+        setLoading(false);
       }
     };
-
     fetchBlogs();
   }, []);
 
+  if (loading) return <div className="h-screen flex items-center justify-center text-xl font-bold">Loading Stories...</div>;
+
   return (
-    <div className="bg-[#050505] min-h-screen py-16 px-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-white text-black py-24 px-6 md:px-20">
 
-        {/* Header */}
-        <div className="mb-12 mt-20 border-l-4 border-[#0078f0] pl-6">
-          <h2 className="text-3xl font-bold text-white mb-2">Latest Insights</h2>
-          <p className="text-gray-400">Click on any card to read the full story.</p>
-        </div>
-
-        {/* Grid System */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {allBlogs.map((blog) => (
-            // --- LINK WRAPPER (Makes whole card clickable) ---
-            <Link
-              to={`/blog/${blog.id}`}
-              key={blog.id}
-              className="group block bg-[#0a0a0a] border border-white/10 rounded-xl overflow-hidden hover:border-[#0078f0] transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,120,240,0.15)] hover:-translate-y-1"
-            >
-              {/* Image */}
-              <div className="relative h-52 overflow-hidden">
-                <img
-                  src={blog.image}
-                  alt={blog.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 opacity-90 group-hover:opacity-100"
-                />
-                <span className="absolute top-3 right-3 bg-[#ff9f20] text-black text-xs font-bold px-3 py-1 rounded-full">
-                  {blog.category}
-                </span>
-              </div>
-
-              {/* Content Preview */}
-              <div className="p-6">
-                <div className="flex items-center text-xs text-[#0078f0] mb-3 font-medium">
-                  <span>{blog.date}</span>
-                  <span className="mx-2 text-gray-600">•</span>
-                  <span>{blog.author}</span>
-                </div>
-
-                <h3 className="text-xl font-bold text-gray-100 mb-3 leading-snug group-hover:text-[#0078f0] transition-colors">
-                  {blog.title}
-                </h3>
-
-                <p className="text-gray-400 text-sm line-clamp-2">
-                  {blog.excerpt}
-                </p>
-
-                <div className="mt-4 flex items-center text-sm font-medium text-white group-hover:text-[#ff9f20] transition-colors">
-                  Read Full Article &rarr;
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+      {/* --- HEADER --- */}
+      <div className="max-w-7xl mx-auto mb-20 border-b border-gray-100 pb-10">
+        <p className="text-blue-600 font-bold uppercase tracking-widest text-xs mb-4">The Journal</p>
+        <h1 className="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-6">
+          Insights & <br /><span className="text-gray-400">Updates.</span>
+        </h1>
+        <p className="text-xl text-gray-500 max-w-2xl leading-relaxed">
+          Explore our latest thoughts on design, technology, and business growth.
+        </p>
       </div>
+
+      {/* --- BLOG GRID --- */}
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+        {blogs.map((blog) => (
+          <Link
+            to={`/blog/${blog.title.replace(/\s+/g, "-").toLowerCase()}`}
+            key={blog._id}
+            className="group block"
+          >
+            {/* Image Card */}
+            <div className="overflow-hidden rounded-2xl mb-6 relative h-[300px] w-full bg-gray-100">
+              <img
+                src={blog.image || "https://placehold.co/600x400"}
+                alt={blog.title}
+                className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                {blog.category || "Tech"}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="pr-4">
+              <div className="flex items-center gap-4 text-xs text-gray-400 font-medium uppercase tracking-wider mb-3">
+                <span className="flex items-center gap-1"><FiCalendar /> {new Date(blog.createdAt).toLocaleDateString()}</span>
+                <span className="flex items-center gap-1"><FiUser /> {blog.author || "Team"}</span>
+              </div>
+
+              <h2 className="text-2xl font-bold leading-tight mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
+                {blog.title}
+              </h2>
+
+              {/* HTML Content ka Plain Text Preview nikalne ka hack */}
+              <div
+                className="text-gray-500 leading-relaxed mb-4 line-clamp-3 text-sm"
+                dangerouslySetInnerHTML={{ __html: blog.content.substring(0, 100) + "..." }}
+              ></div>
+
+              <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest border-b border-black pb-1 group-hover:text-blue-600 group-hover:border-blue-600 transition-all">
+                Read Full Story <FiArrowUpRight />
+              </span>
+            </div>
+          </Link>
+        ))}
+      </div>
+
     </div>
   );
 };
 
-export default BlogList;
+export default Blogs;

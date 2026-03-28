@@ -73,7 +73,7 @@ const AboutSection = () => {
   const stats = [
     { value: "500+", label: "Happy Clients" },
     { value: "320+", label: "Projects Done" },
-    { value: "8+", label: "Years Strong" },
+    { value: "5+", label: "Years Strong" },
   ];
 
   return (

@@ -100,7 +100,7 @@ const HeroSection = () => {
               
               {/* Small badge */}
               <div className="absolute -bottom-4 -left-4 bg-[#0078f0] text-black font-bold px-6 py-3 rounded-full text-sm">
-                7+ Years Experience
+                5+ Years Experience
               </div>
             </div>
           </div>
